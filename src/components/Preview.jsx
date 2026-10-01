@@ -9,6 +9,7 @@ export function Preview() {
   const frame = useRef(null);
   const [progress, setProgress] = useState(0);
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     function scroll() {
       const box = frame.current.getBoundingClientRect();
       setProgress(Math.max(0, Math.min(1, (window.innerHeight - box.top) / (window.innerHeight + box.height))));

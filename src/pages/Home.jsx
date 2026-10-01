@@ -29,6 +29,7 @@ function Hero() {
   }, []);
 
   function moveGlow(event) {
+    if (event.pointerType !== "mouse") return;
     const box = event.currentTarget.getBoundingClientRect();
     setGlow({ x: event.clientX - box.left, y: event.clientY - box.top, visible: true });
   }
