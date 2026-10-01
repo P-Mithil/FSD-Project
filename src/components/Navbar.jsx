@@ -12,7 +12,8 @@ export default function Navbar({ path }) {
 
   return (
     <header className={`site-nav${scrolled ? " is-scrolled" : ""}`} onKeyDown={event => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && open) {
+        event.preventDefault();
         setOpen(false);
         event.currentTarget.querySelector("button").focus();
       }
