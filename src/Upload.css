@@ -1,0 +1,128 @@
+.upload-page {
+  --bg: #050505;
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
+  --line: rgba(255, 255, 255, 0.16);
+  --card: #0c0c0c;
+  --accent: #e53e50;
+  --accent-hover: #f05263;
+  --accent-text: #ff9aa5;
+  color-scheme: dark;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 85px 4vw 40px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  line-height: normal;
+}
+
+.upload-page .panel-section { max-width: 1120px; margin: 0 auto; padding: 28px 0 10px; }
+.upload-page h2 { margin: 0 0 12px; font-size: clamp(1.8rem, 3vw, 2.4rem); letter-spacing: -0.03em; text-wrap: balance; }
+.upload-page h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.upload-page p { margin-top: 0; line-height: 1.6; color: var(--text); }
+.upload-page .section-heading p:last-child, .upload-page .card-help { color: var(--muted); }
+.upload-page .eyebrow { margin-bottom: 10px; color: var(--accent-text); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+.upload-page .input-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+.upload-page .document-input { min-width: 0; }
+.upload-page .upload-label, .upload-page .text-label { display: block; font-weight: 600; margin-bottom: 8px; }
+.upload-page textarea:focus-visible, .upload-page input:focus-visible, .upload-page button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.upload-page .button { display: inline-flex; align-items: center; justify-content: center; padding: 13px 22px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent); color: white; font: inherit; font-weight: 600; }
+.upload-page .button:disabled { opacity: 0.55; cursor: not-allowed; }
+.upload-page .button-secondary { background: transparent; border-color: var(--line); }
+.upload-page .error-box { margin-top: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: #111; }
+.upload-page .fine-print { margin-top: 12px; color: var(--muted); font-size: 0.92rem; }
+
+.upload-page .section-heading {
+  max-width: 680px;
+  margin-bottom: 22px;
+}
+
+.upload-page .card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--card);
+}
+
+.upload-page .card-help {
+  margin-bottom: 14px;
+}
+
+.upload-page textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #000000;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.upload-page .file-status {
+  margin-bottom: 0;
+}
+
+.upload-page .action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.upload-page .upload-area {
+  padding: 20px;
+  margin: 18px 0;
+  border: 1px dashed #ffffff38;
+  border-radius: 16px;
+  background: #ffffff03;
+}
+
+.upload-page .upload-area .card-help {
+  font-size: 0.85rem;
+}
+
+.upload-page .upload-area input {
+  display: block;
+  max-width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #b9b9b9;
+}
+
+.upload-page .upload-area input::file-selector-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  margin-right: 10px;
+  background: white;
+  color: black;
+  cursor: pointer;
+  font: inherit;
+}
+
+.upload-page .upload-area .file-status {
+  margin-top: 12px;
+  color: #aaa;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.upload-page .text-count {
+  margin: 8px 0 0;
+  color: #aaa;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.upload-page .over-limit {
+  color: #ffa6ad;
+}
+
+@media (max-width: 860px) {
+  .upload-page .input-grid { grid-template-columns: minmax(0, 1fr); }
+}
