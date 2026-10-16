@@ -1,0 +1,51 @@
+.jobs-list {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+}
+
+.jobs-list > li {
+  padding: 24px 0;
+  border-top: 1px solid #333;
+  overflow-wrap: anywhere;
+}
+
+.jobs-list h2 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+}
+
+.jobs-list dl {
+  margin: 0 0 16px;
+}
+
+.jobs-list dl > div {
+  margin: 6px 0;
+}
+
+.jobs-list dt,
+.jobs-list dd {
+  display: inline;
+}
+
+.jobs-list dt {
+  color: #b8b8b8;
+}
+
+.jobs-list dt::after {
+  content: ": ";
+}
+
+.jobs-list dd {
+  margin: 0;
+}
+
+.jobs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
