@@ -1,6 +1,6 @@
 # ResuMate: Live Jobs
 
-Mithil's second Live Jobs milestone adds real listings with title, company, location, employment type and the source application link. Loading, empty-feed and API-error messages are included. It does not include filters, resume matching, percentages, advanced cards or animations.
+Mithil's third Live Jobs milestone displays real listings in responsive cards with title, company, location, employment type, available salary text and a source Apply button. Company initials provide a fallback where logos are unavailable. Loading, empty-feed and API-error messages remain. Filters, resume matching, percentages and animations are not included yet.
 
 ## Run locally
 
@@ -38,4 +38,6 @@ Visible attribution and each supplied Dev Global Jobs application URL are preser
 npm test
 ```
 
-Tests use controlled API responses for successful listings, empty feeds, provider failures, missing fields and unsafe links. They do not depend on live job availability.
+Tests use controlled API responses for successful listings, empty feeds, provider failures, missing fields, unsafe links and salary mapping. They do not depend on live job availability.
+
+Cards use two columns on desktop and one on mobile. Apply buttons preserve the provider URL and open it in a new tab. Salary text is shown as supplied; missing salaries say "Not listed", without guessing currency or pay period. Company initials are decorative; the full company name remains visible. No logo requests or additional dependencies are needed.

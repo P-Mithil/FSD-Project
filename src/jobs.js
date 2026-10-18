@@ -57,6 +57,7 @@ export async function getJobs(signal) {
       company: getText(job.organization, "Company not provided"),
       location: getText(job.location, "Location not provided"),
       type: getText(job.jobType, "Employment type not provided"),
+      salary: getText(job.salary, "") || null,
       url: getLink(job.url),
     });
   }

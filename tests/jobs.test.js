@@ -30,13 +30,26 @@ test("requests the India technology feed and preserves listing fields and source
   assert.ok(options.signal instanceof AbortSignal);
   assert.deepEqual(jobs, [{
     id: "123", title: "React Developer", company: "Test Company",
-    location: "Bengaluru, India", type: "Full-time", url: listing().url,
+    location: "Bengaluru, India", type: "Full-time", salary: null, url: listing().url,
   }]);
 });
 
 test("an empty feed stays empty", async (t) => {
   mockFeed(t, []);
   assert.deepEqual(await getJobs(new AbortController().signal), []);
+});
+
+test("preserves supplied salary text and does not invent missing salary details", async (t) => {
+  mockFeed(t, [
+    listing({ salary: "  INR 600,000–900,000 per year  " }),
+    listing({ id: 124, salary: null }),
+    listing({ id: 125, salary: " " }),
+    listing({ id: 126, salary: 900000 }),
+  ]);
+  const jobs = await getJobs(new AbortController().signal);
+  assert.deepEqual(jobs.map((job) => job.salary), [
+    "INR 600,000–900,000 per year", null, null, null,
+  ]);
 });
 
 test("labels absent fields and never exposes unsafe application URLs", async (t) => {
