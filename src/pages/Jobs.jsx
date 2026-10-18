@@ -34,14 +34,17 @@ export default function Jobs() {
   }, []);
 
   return (
-    <main aria-labelledby="jobs-title">
-      <h1 id="jobs-title">Live Jobs</h1>
-      <p>Browse technology job listings from the India feed.</p>
-      <p>
-        <a href="https://devglobaljobs.com" target="_blank" rel="noopener noreferrer">
+    <main className="jobs-page" aria-labelledby="jobs-title">
+      <div className="jobs-heading">
+        <div>
+          <p className="jobs-eyebrow">RESUMATE · OPPORTUNITIES</p>
+          <h1 id="jobs-title">Live Jobs</h1>
+          <p>Browse technology job listings from the India feed.</p>
+        </div>
+        <a className="jobs-attribution" href="https://devglobaljobs.com" target="_blank" rel="noopener noreferrer">
           Powered by Dev Global Jobs
         </a>
-      </p>
+      </div>
 
       {loading ? <p role="status">Loading jobs...</p> : null}
       {error ? <p role="alert">{error}</p> : null}
@@ -52,20 +55,55 @@ export default function Jobs() {
       <ul className="jobs-list" aria-label="Job listings">
         {jobs.map((job) => (
           <li key={job.id}>
-            <h2>{job.title}</h2>
-            <dl>
-              <div><dt>Company</dt><dd>{job.company}</dd></div>
-              <div><dt>Location</dt><dd>{job.location}</dd></div>
-              <div><dt>Employment type</dt><dd>{job.type}</dd></div>
-            </dl>
-            {job.url ? (
-              <a href={job.url} target="_blank" rel="noopener noreferrer">
-                Apply on Source<span className="jobs-sr-only">: {job.title} at {job.company}</span>
-              </a>
-            ) : <p>Application link unavailable.</p>}
+            <JobCard job={job} />
           </li>
         ))}
       </ul>
     </main>
+  );
+}
+
+function JobCard({ job }) {
+  const initials = job.company === "Company not provided"
+    ? "?"
+    : job.company.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
+
+  return (
+    <article className="job-card" aria-labelledby={`job-${job.id}-title`}>
+      <header className="job-company-row">
+        <span className="job-initials" aria-hidden="true">{initials}</span>
+        <p className="job-company">{job.company}</p>
+      </header>
+      <h2 id={`job-${job.id}-title`}>{job.title}</h2>
+      <dl className="job-details">
+        <div>
+          <dt>Location</dt>
+          <dd>{job.location}</dd>
+        </div>
+        <div>
+          <dt>Employment type</dt>
+          <dd>{job.type}</dd>
+        </div>
+      </dl>
+      <footer className="job-footer">
+        <div className="job-pay">
+          <span>Salary</span>
+          <p className={job.salary ? "job-salary" : "job-salary-missing"}>
+            {job.salary || "Not listed"}
+          </p>
+        </div>
+        {job.url ? (
+          <a
+            className="job-apply"
+            href={job.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Apply on Source: ${job.title} at ${job.company} (opens in a new tab)`}
+          >
+            Apply on Source <span aria-hidden="true">↗</span>
+          </a>
+        ) : <span className="job-link-missing">Application link unavailable</span>}
+      </footer>
+    </article>
   );
 }
