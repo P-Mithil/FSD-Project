@@ -5,6 +5,7 @@ export function DocumentInput({
   fileName,
   reading,
   disabled,
+  error = "",
   limit,
   onFileChange,
   onTextChange,
@@ -12,6 +13,10 @@ export function DocumentInput({
   allowDocx = false,
 }) {
   const id = `${prefix}${kind}-text`;
+  const errorId = `${prefix}${kind}-error`;
+  const countId = `${prefix}${kind}-count`;
+  const limitId = `${prefix}${kind}-limit-error`;
+  const overLimit = value.length > limit;
   return (
     <article className="card document-input">
       <h3>{title}</h3>
@@ -33,6 +38,8 @@ export function DocumentInput({
               : "application/pdf,.pdf"
           }
           aria-label={`Upload ${title.toLowerCase()} ${allowDocx ? "PDF or DOCX" : "PDF"}`}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
           disabled={disabled}
           onChange={(event) => onFileChange(kind, event)}
         />
@@ -41,6 +48,7 @@ export function DocumentInput({
             ? "Reading document..."
             : fileName || "Or paste your text below"}
         </p>
+        {error ? <p id={errorId} className="error-box" role="alert">{error}</p> : null}
       </div>
       <label className="text-label" htmlFor={id}>
         {title} text
@@ -51,16 +59,20 @@ export function DocumentInput({
         onChange={(event) => onTextChange(kind, event.target.value)}
         placeholder={`Paste your ${title.toLowerCase()} here...`}
         disabled={disabled}
-        aria-describedby={`${prefix}${kind}-count`}
+        aria-invalid={overLimit}
+        aria-describedby={overLimit ? `${countId} ${limitId}` : countId}
       />
       <p
-        id={`${prefix}${kind}-count`}
-        className={
-          value.length > limit ? "text-count over-limit" : "text-count"
-        }
+        id={countId}
+        className={overLimit ? "text-count over-limit" : "text-count"}
       >
         {value.length.toLocaleString()} / {limit.toLocaleString()} characters
       </p>
+      {overLimit ? (
+        <p id={limitId} className="error-box" role="alert">
+          Use up to {limit.toLocaleString()} characters for {title.toLowerCase()}.
+        </p>
+      ) : null}
     </article>
   );
 }

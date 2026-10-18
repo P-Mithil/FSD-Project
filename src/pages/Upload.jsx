@@ -9,7 +9,6 @@ export default function Upload() {
   const [errors, setErrors] = useState({ resume: "", job: "" });
   const [reading, setReading] = useState({ resume: false, job: false });
   const uploads = useRef({ resume: 0, job: 0 });
-  const error = Object.values(errors).filter(Boolean).join(" ");
 
   function editText(kind, value) {
     uploads.current[kind]++;
@@ -53,6 +52,7 @@ export default function Upload() {
       const messages = {
         INVALID_TYPE: "Please choose a PDF or DOCX document.",
         INVALID_PDF: "This PDF could not be read. Choose a valid text-based PDF or paste the text.",
+        PASSWORD_PDF: "This PDF is password-protected. Choose an unlocked copy or paste the text.",
         INVALID_DOCX: "This DOCX could not be read. Choose a valid document or paste the text.",
         DOCX_TOO_LARGE: "This DOCX expands to too much content. Choose a simpler document or paste the text.",
         FILE_TOO_LARGE: "Please choose a document of up to 5 MB.",
@@ -60,9 +60,8 @@ export default function Upload() {
         NO_TEXT: "No readable text was found. Choose a text-based document or paste the text.",
         TOO_LONG: `Use up to ${limit.toLocaleString()} characters for this document.`,
       };
-      const label = kind === "resume" ? "Resume" : "Job description";
       const message = messages[err.message] || "This document could not be read. Try another file or paste the text.";
-      setErrors(prev => ({ ...prev, [kind]: `${label}: ${message}` }));
+      setErrors(prev => ({ ...prev, [kind]: message }));
     } finally {
       if (version === uploads.current[kind]) {
         setReading(prev => ({ ...prev, [kind]: false }));
@@ -85,6 +84,7 @@ export default function Upload() {
             value={text.resume}
             fileName={files.resume}
             reading={reading.resume}
+            error={errors.resume}
             allowDocx
             limit={15000}
             onFileChange={selectFile}
@@ -96,16 +96,13 @@ export default function Upload() {
             value={text.job}
             fileName={files.job}
             reading={reading.job}
+            error={errors.job}
             allowDocx
             limit={12000}
             onFileChange={selectFile}
             onTextChange={editText}
           />
         </div>
-        {error ? <p className="error-box" role="alert">{error}</p> : null}
-        {text.resume.length > 15000 || text.job.length > 12000 ? (
-          <p className="error-box" role="alert">Use up to 15,000 characters for your resume and 12,000 for the job description.</p>
-        ) : null}
         <div className="action-row">
           <button className="button" type="button" disabled title="Analysis is not connected in this interface milestone.">Analyze Resume</button>
           <button className="button button-secondary" type="button" disabled title="Sample results are not connected in this interface milestone.">Show sample analysis</button>

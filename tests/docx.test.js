@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { validateDocxBytes, extractDocxText } from "../src/extractDocxText.js";
+import { MAX_FILE_BYTES } from "../src/pdfValidation.js";
 const bytes = new Uint8Array(
   await readFile(new URL("./fixtures/resume.docx", import.meta.url)),
 );
@@ -17,6 +18,12 @@ test("DOCX raw text extraction preserves actual resume text", async () => {
   assert.match(text, /Frontend Developer/);
   assert.match(text, /Skills: React, JavaScript, CSS/);
   assert.ok(!text.includes("<w:"));
+});
+
+test("DOCX validation checks actual byte size and rejects truncated ZIP data", () => {
+  assert.throws(() => validateDocxBytes(file, new Uint8Array(MAX_FILE_BYTES + 1)), /FILE_TOO_LARGE/);
+  assert.throws(() => validateDocxBytes(file, bytes.slice(0, -10)), /INVALID_DOCX/);
+  assert.doesNotThrow(() => validateDocxBytes({ ...file, name: "RESUME.DOCX" }, bytes));
 });
 test("invalid, renamed, oversized and decompression-bomb DOCX archives are rejected", () => {
   assert.throws(

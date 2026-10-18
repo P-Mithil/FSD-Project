@@ -32,6 +32,10 @@ export async function extractPdfText(file) {
       .replace(/[ \t]+/g, " ")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
+  } catch (err) {
+    if (err.message === "TOO_MANY_PAGES") throw err;
+    if (err.name === "PasswordException") throw new Error("PASSWORD_PDF");
+    throw new Error("INVALID_PDF");
   } finally {
     await loadingTask.destroy();
   }
