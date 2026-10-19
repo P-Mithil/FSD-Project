@@ -3,8 +3,7 @@ import { DocumentInput } from "../components/DocumentInput.jsx";
 import { MAX_FILE_BYTES } from "../pdfValidation.js";
 import "../Upload.css";
 
-export default function Upload() {
-  const [text, setText] = useState({ resume: "", job: "" });
+export default function Upload({ text, onTextChange }) {
   const [files, setFiles] = useState({ resume: "", job: "" });
   const [errors, setErrors] = useState({ resume: "", job: "" });
   const [reading, setReading] = useState({ resume: false, job: false });
@@ -12,7 +11,7 @@ export default function Upload() {
 
   function editText(kind, value) {
     uploads.current[kind]++;
-    setText(prev => ({ ...prev, [kind]: value }));
+    onTextChange(kind, value);
     setFiles(prev => ({ ...prev, [kind]: "" }));
     setErrors(prev => ({ ...prev, [kind]: "" }));
     setReading(prev => ({ ...prev, [kind]: false }));
@@ -45,7 +44,7 @@ export default function Upload() {
       if (version !== uploads.current[kind]) return;
       if (!value.trim()) throw new Error("NO_TEXT");
       if (value.length > limit) throw new Error("TOO_LONG");
-      setText(prev => ({ ...prev, [kind]: value }));
+      onTextChange(kind, value);
       setFiles(prev => ({ ...prev, [kind]: file.name }));
     } catch (err) {
       if (version !== uploads.current[kind]) return;

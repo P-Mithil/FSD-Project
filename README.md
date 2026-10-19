@@ -24,7 +24,9 @@ npm run preview
 
 ## Document extraction
 
-Each input has independent text, filename, reading and error state. Selecting a new file replaces only that document after successful extraction. Pasting or editing text cancels stale upload results. Unreadable or empty documents show an error while preserving existing text.
+`App.jsx` holds both document texts in simple React state: `text.resume` and `text.job`. `Upload` receives `text` and `onTextChange(kind, value)` as props. A future analysis component can receive `resumeText={text.resume}` and `jobDescription={text.job}` from App. No analysis component or API call is included here.
+
+Each input has independent filename, reading and error state. Selecting a new file replaces only that document after successful extraction. Pasting or editing text cancels stale upload results. Unreadable or empty documents show an error beside that input while preserving existing text. Refreshing clears this in-memory state; documents are not saved.
 
 Files are limited to 5 MB, PDFs to 20 pages, resume text to 15,000 characters and JD text to 12,000. DOCX structure and expansion limits are checked before extraction. Scanned PDFs need pasted text because OCR is not included. Analyze and sample-result buttons remain disabled until the analysis feature is connected.
 
