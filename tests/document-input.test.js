@@ -7,6 +7,7 @@ import { createServer } from "vite";
 const server = await createServer({ server: { middlewareMode: true } });
 after(() => server.close());
 const { DocumentInput } = await server.ssrLoadModule("/src/components/DocumentInput.jsx");
+const { default: Upload } = await server.ssrLoadModule("/src/pages/Upload.jsx");
 
 function render(props) {
   return renderToStaticMarkup(createElement(DocumentInput, {
@@ -36,4 +37,14 @@ test("pasted text limits and accessible error IDs stay independent for each docu
     assert.ok(invalid.includes(`id="${kind}-limit-error"`));
     assert.ok(invalid.includes(`Use up to ${limit.toLocaleString()} characters for ${title.toLowerCase()}.`));
   }
+});
+
+test("upload renders both document texts supplied by its parent for analysis integration", () => {
+  const html = renderToStaticMarkup(createElement(Upload, {
+    text: { resume: "Shared resume text", job: "Shared job description" },
+    onTextChange() {},
+  }));
+  assert.match(html, /id="resume-text"[^>]*>Shared resume text<\/textarea>/);
+  assert.match(html, /id="job-text"[^>]*>Shared job description<\/textarea>/);
+  assert.ok(!html.includes('role="alert"'));
 });
