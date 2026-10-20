@@ -3,7 +3,7 @@ import { DocumentInput } from "../components/DocumentInput.jsx";
 import { MAX_FILE_BYTES } from "../pdfValidation.js";
 import "../Upload.css";
 
-export default function Upload({ text, onTextChange }) {
+export default function Upload({ text, onTextChange, onShowDemo, showSample = false }) {
   const [files, setFiles] = useState({ resume: "", job: "" });
   const [errors, setErrors] = useState({ resume: "", job: "" });
   const [reading, setReading] = useState({ resume: false, job: false });
@@ -104,7 +104,7 @@ export default function Upload({ text, onTextChange }) {
         </div>
         <div className="action-row">
           <button className="button" type="button" disabled title="Analysis is not connected in this interface milestone.">Analyze Resume</button>
-          <button className="button button-secondary" type="button" disabled title="Sample results are not connected in this interface milestone.">Show sample analysis</button>
+          <button className="button button-secondary" type="button" disabled={!onShowDemo} onClick={onShowDemo} aria-pressed={showSample}>{showSample ? "Back to your documents" : "Show sample analysis"}</button>
         </div>
         <p className="fine-print">Your documents stay in this browser. This page does not send an analysis request.</p>
       </section>
