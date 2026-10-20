@@ -8,6 +8,8 @@ const server = await createServer({ server: { middlewareMode: true } });
 after(() => server.close());
 const { DocumentInput } = await server.ssrLoadModule("/src/components/DocumentInput.jsx");
 const { default: Upload } = await server.ssrLoadModule("/src/pages/Upload.jsx");
+const { ReviewResults } = await server.ssrLoadModule("/src/components/ReviewResults.jsx");
+const { default: sample } = await server.ssrLoadModule("/src/sampleAnalysis.json");
 
 function render(props) {
   return renderToStaticMarkup(createElement(DocumentInput, {
@@ -47,4 +49,30 @@ test("upload renders both document texts supplied by its parent for analysis int
   assert.match(html, /id="resume-text"[^>]*>Shared resume text<\/textarea>/);
   assert.match(html, /id="job-text"[^>]*>Shared job description<\/textarea>/);
   assert.ok(!html.includes('role="alert"'));
+});
+
+test("results preserve shared resume text without inventing a live score", () => {
+  const html = renderToStaticMarkup(createElement(ReviewResults, {
+    analysis: null, resumeText: "My uploaded resume <script>", jobDescription: "React developer",
+  }));
+  assert.ok(html.includes("My uploaded resume &lt;script&gt;"));
+  assert.ok(html.includes("Resume ready"));
+  assert.ok(html.includes("Job description ready"));
+  assert.ok(html.includes("Match score unavailable"));
+  assert.ok(html.includes("No score has been calculated."));
+  assert.ok(!html.includes("out of 100"));
+  assert.ok(!html.includes('class="resume-highlight"'));
+});
+
+test("original fictional sample renders its score, annotations, skills and three improvements", () => {
+  const html = renderToStaticMarkup(createElement(ReviewResults, {
+    ...sample, isDemo: true,
+  }));
+  assert.ok(html.includes("Fictional resume and saved results"));
+  assert.ok(html.includes(`Estimated match score: ${sample.analysis.matchScore} out of 100`));
+  assert.equal((html.match(/class="card change-card"/g) || []).length, 3);
+  assert.equal((html.match(/class="resume-highlight"/g) || []).length, 2);
+  for (const label of ["Matched Skills", "Partially Matched Skills", "Missing Skills", "How was this score calculated?"]) {
+    assert.ok(html.includes(label));
+  }
 });

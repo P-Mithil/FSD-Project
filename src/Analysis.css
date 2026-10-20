@@ -1,0 +1,541 @@
+.analysis-results {
+  --bg: #050505; --text: #f5f5f5; --muted: #a3a3a3;
+  --line: rgba(255,255,255,0.16); --card: #0c0c0c;
+  --accent: #e53e50; --accent-text: #ff9aa5;
+  color: var(--text); background: var(--bg);
+  font-family: "Outfit", "Segoe UI", sans-serif; line-height: normal;
+  margin: 0 auto; padding: 34px 0 40px; scroll-margin-top: 24px;
+}
+.analysis-results h2 { margin: 0 0 12px; font-size: clamp(1.8rem,3vw,2.4rem); letter-spacing: -0.03em; text-wrap: balance; }
+.analysis-results h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.analysis-results p { margin-top: 0; line-height: 1.6; }
+.analysis-results .eyebrow { margin-bottom: 10px; color: var(--accent-text); font-size: .82rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.analysis-results .card { padding: 22px; border: 1px solid var(--line); border-radius: 22px; background: var(--card); }
+.analysis-results .section-heading { max-width: 680px; margin-bottom: 22px; }
+.analysis-results .card-help, .analysis-results .empty-note { color: var(--muted); }
+.analysis-results .change-grid { display: grid; gap: 18px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.analysis-results .demo-banner { padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: #111; }
+.analysis-results .resume-text:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 4px; }
+.score-ring {
+  width: 148px;
+  height: 148px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.score-center {
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border-radius: 50%;
+  background: #000000;
+}
+
+.score-center strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.score-center span,
+.fine-print {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.finding-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finding-list li + li {
+  margin-top: 16px;
+}
+
+.tag {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.tag-missing {
+  border: 1px solid #ffffff;
+}
+
+blockquote {
+  margin: 8px 0 0;
+  padding-left: 12px;
+  border-left: 3px solid #ffffff;
+  color: var(--muted);
+}
+
+.change-number {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.score-breakdown {
+  text-align: left;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  font-size: 0.8rem;
+}
+.score-breakdown summary {
+  cursor: pointer;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.score-breakdown p {
+  margin: 10px 0;
+  color: #bdbdbd;
+}
+.score-formula {
+  overflow-wrap: anywhere;
+}
+.tag-partial {
+  color: #f0d591;
+  background: #d6aa3520;
+  border: 1px solid #d6aa3540;
+}
+.skill-priority {
+  margin-left: 8px;
+  color: #aaa;
+  font-size: 0.75rem;
+}
+.recommendation-type {
+  margin-top: 12px;
+  color: #a0ebba;
+  font-size: 0.75rem;
+}
+.review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 24px;
+}
+.resume-paper {
+  min-width: 0;
+  padding: 32px;
+  background: #f6f3ee;
+  border: 1px solid #ded9d2;
+  border-radius: 22px;
+  color: #26221f;
+}
+.resume-paper-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #d8d0c8;
+}
+.resume-paper .eyebrow {
+  color: #75685f;
+  font-size: 0.7rem;
+}
+.review-badge {
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  vertical-align: middle;
+}
+.review-caption {
+  margin: 14px 0 22px;
+  color: #776d64;
+  font-size: 0.8rem;
+}
+.resume-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.94rem;
+  line-height: 1.9;
+}
+.resume-highlight {
+  color: #9b2432;
+  background: #fbd6da;
+  border-bottom: 2px solid #c83c4d;
+  border-radius: 3px;
+  padding: 2px 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.inline-suggestion {
+  display: block;
+  white-space: normal;
+  margin: 10px 0 18px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.annotation-reason {
+  display: block;
+  color: #a02e3a;
+  margin-bottom: 8px;
+}
+.suggested-wording {
+  display: block;
+  background: #e3f4e8;
+  color: #185d36;
+  border-left: 3px solid #378455;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px;
+}
+.suggested-wording strong {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.tag-missing {
+  color: #ffadb6;
+  border-color: #b8354566;
+  background: #b835451a;
+}
+.tag-match {
+  color: #a0ebba;
+  background: #37845526;
+}
+.change-card {
+  border-top: 2px solid #378455;
+}
+.change-number {
+  background: #d9f6e3;
+  color: #185d36;
+}
+.review-layout p,
+.review-layout blockquote {
+  overflow-wrap: anywhere;
+}
+/* Refined results: overview, resume review, skill groups, and three next steps. */
+.results {
+  width: min(1280px, calc(100% - 8vw));
+}
+.results .match-overview {
+  margin-bottom: 32px;
+  padding: 28px 32px;
+}
+.overview-heading h2 {
+  margin-bottom: 20px;
+}
+.overview-content {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+}
+.overview-score {
+  text-align: center;
+}
+.overview-score .score-ring {
+  margin: 0 auto 12px;
+  width: 174px;
+  height: 174px;
+}
+.overview-score .score-center {
+  width: 138px;
+  height: 138px;
+}
+.overview-score .score-center strong {
+  font-size: 3rem;
+}
+.overview-score p {
+  color: #bdbdbd;
+  margin: 0;
+}
+.overview-summary {
+  max-width: 700px;
+}
+.overview-summary > p {
+  font-size: 1rem;
+  color: #d4d4d4;
+}
+.qualification-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.qualification-counts > div {
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.qualification-counts dt {
+  color: #bdbdbd;
+  font-size: 0.9rem;
+}
+.qualification-counts dd {
+  margin: 5px 0 0;
+  font-size: 1.9rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.count-match {
+  color: #93e9b5;
+}
+.count-partial {
+  color: #f0d591;
+}
+.count-missing {
+  color: #ffadb6;
+}
+.results .score-breakdown {
+  margin-top: 24px;
+  font-size: 0.95rem;
+}
+.results summary {
+  cursor: pointer;
+}
+.results summary:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 4px;
+}
+.results .score-breakdown > summary {
+  font-size: 1rem;
+  padding: 8px 0;
+}
+.score-table-wrap {
+  overflow-x: auto;
+}
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.score-table caption {
+  text-align: left;
+  color: #aaa;
+  font-size: 0.85rem;
+  padding: 8px 0;
+}
+.score-table td,
+.score-table th {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.score-table th {
+  font-weight: 500;
+}
+.score-table thead th {
+  color: var(--accent-text);
+}
+.score-table small {
+  display: block;
+  color: #a3a3a3;
+  font-size: 0.75rem;
+  margin-top: 3px;
+}
+.deductions {
+  padding: 12px 0;
+}
+.deduction-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.results .review-layout {
+  grid-template-columns: minmax(0, 1.65fr) minmax(340px, 1fr);
+  gap: 28px;
+}
+.results .section-heading.tight {
+  margin: 0 0 18px;
+}
+.results .section-heading h2 {
+  font-size: clamp(1.7rem, 2.2vw, 2.1rem);
+}
+.results .resume-paper {
+  padding: 26px;
+}
+.results .resume-text {
+  max-height: 780px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 12px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.results .resume-paper-heading h3 {
+  margin: 0;
+}
+.results .inline-suggestion {
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.results .suggested-wording {
+  margin: 8px 0;
+}
+.requirement-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  white-space: normal;
+  margin-top: 10px;
+}
+.requirement-label {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #ffffff30;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: #bdbdbd;
+}
+.resume-paper .requirement-label {
+  color: #62564c;
+  border-color: #cfc5bb;
+}
+.annotation-source {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #62564c;
+}
+.annotation-source q {
+  display: block;
+  margin-top: 8px;
+}
+.skill-group {
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.skill-group > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.skill-group > summary::after {
+  content: "+";
+  margin-left: auto;
+  color: #aaa;
+  font-size: 1.2rem;
+}
+.skill-group[open] > summary::after {
+  content: "−";
+}
+.skill-group summary h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.skill-group .finding-list {
+  padding-top: 18px;
+  max-height: 540px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 8px;
+}
+.skill-group .finding-list > li + li {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.skill-item-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.skill-item-heading .tag {
+  margin: 0;
+}
+.skill-item-heading .skill-priority {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+}
+.skill-group p,
+.skill-group blockquote {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.skill-source {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 10px;
+}
+.equivalent-note {
+  display: block;
+  margin-top: 8px;
+  color: #93e9b5;
+  font-size: 0.8rem;
+}
+.recommendations {
+  margin-top: 36px;
+}
+.recommendations .change-card {
+  padding: 24px;
+}
+.recommendation-action {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  color: #cce9d6;
+}
+.recommendation-action strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.8rem;
+  color: #93e9b5;
+}
+@media (max-width: 980px) {
+  .results .review-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .overview-content {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .results .resume-text {
+    max-height: 680px;
+  }
+}
+@media (max-width: 600px) {
+  .results .match-overview,
+  .results .resume-paper {
+    padding: 20px 16px;
+  }
+  .overview-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .qualification-counts {
+    gap: 8px;
+  }
+  .qualification-counts > div {
+    padding: 12px;
+  }
+  .qualification-counts dd {
+    font-size: 1.6rem;
+  }
+  .score-table {
+    font-size: 0.875rem;
+  }
+  .score-table td,
+  .score-table th {
+    padding: 10px 4px;
+  }
+  .results .resume-text {
+    font-size: 0.95rem;
+    padding-right: 6px;
+    max-height: 70vh;
+  }
+  .skill-group {
+    padding: 18px 16px;
+  }
+}
+
+@media (max-width: 860px) { .analysis-results .change-grid { grid-template-columns: minmax(0,1fr); } }

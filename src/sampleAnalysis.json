@@ -1,0 +1,392 @@
+{
+  "analysis": {
+    "annotations": [
+      {
+        "quote": "Worked on various web projects and know React.",
+        "explanation": "The profile is vague. Name the work that demonstrates your React experience.",
+        "suggestion": "Built Campus Events, a React app with JavaScript event filters and a responsive CSS layout.",
+        "requirementIds": [
+          "q:react"
+        ],
+        "jdRelation": "A concrete project summary supports the frontend technologies.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs."
+      },
+      {
+        "quote": "Skills: HTML, CSS, JavaScript, React, Node.js.",
+        "explanation": "Node.js is listed without a supporting project. Keep the skills you can demonstrate.",
+        "suggestion": "Skills: HTML, CSS, JavaScript, React. Keep Node.js only if you can describe how you used it.",
+        "requirementIds": [
+          "q:react"
+        ],
+        "jdRelation": "Prioritize technologies the project demonstrates.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs."
+      }
+    ],
+    "matchScore": 56,
+    "breakdown": [
+      {
+        "id": "required",
+        "label": "Required qualifications",
+        "weight": 45,
+        "applicable": true,
+        "earned": 3,
+        "possible": 5,
+        "score": 60,
+        "effectiveWeight": 45,
+        "contribution": 27,
+        "deductions": [
+          {
+            "category": "required",
+            "name": "Git",
+            "alternatives": [
+              "Git"
+            ],
+            "status": "missing",
+            "resumeEvidence": "",
+            "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+            "explanation": "No supporting resume evidence was found for Git.",
+            "id": "q:git",
+            "matchKind": "missing"
+          },
+          {
+            "category": "required",
+            "name": "REST APIs",
+            "alternatives": [
+              "REST APIs"
+            ],
+            "status": "missing",
+            "resumeEvidence": "",
+            "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+            "explanation": "No supporting resume evidence was found for REST APIs.",
+            "id": "q:rest api",
+            "matchKind": "missing"
+          }
+        ]
+      },
+      {
+        "id": "preferred",
+        "label": "Preferred qualifications",
+        "weight": 15,
+        "applicable": true,
+        "earned": 0.5,
+        "possible": 2,
+        "score": 25,
+        "effectiveWeight": 15,
+        "contribution": 3.75,
+        "deductions": [
+          {
+            "category": "preferred",
+            "name": "TypeScript",
+            "alternatives": [
+              "TypeScript"
+            ],
+            "status": "partial",
+            "resumeEvidence": "Skills: HTML, CSS, JavaScript, React, Node.js.",
+            "jdEvidence": "Preferred: TypeScript and Docker.",
+            "explanation": "JavaScript provides related knowledge; it does not demonstrate TypeScript.",
+            "id": "q:typescript",
+            "matchKind": "partial"
+          },
+          {
+            "category": "preferred",
+            "name": "Docker",
+            "alternatives": [
+              "Docker"
+            ],
+            "status": "missing",
+            "resumeEvidence": "",
+            "jdEvidence": "Preferred: TypeScript and Docker.",
+            "explanation": "No supporting resume evidence was found for Docker.",
+            "id": "q:docker",
+            "matchKind": "missing"
+          }
+        ]
+      },
+      {
+        "id": "projects",
+        "label": "Projects relevance",
+        "weight": 20,
+        "applicable": true,
+        "earned": 1,
+        "possible": 1,
+        "score": 100,
+        "effectiveWeight": 20,
+        "contribution": 20,
+        "deductions": []
+      },
+      {
+        "id": "experience",
+        "label": "Experience relevance",
+        "weight": 15,
+        "applicable": true,
+        "earned": 0,
+        "possible": 1,
+        "score": 0,
+        "effectiveWeight": 15,
+        "contribution": 0,
+        "deductions": [
+          {
+            "category": "experience",
+            "name": "Team collaboration",
+            "alternatives": [],
+            "status": "missing",
+            "resumeEvidence": "",
+            "jdEvidence": "Experience collaborating with a team is required.",
+            "explanation": "No supporting resume evidence was found for Team collaboration.",
+            "id": "experience:experience collaborating with a team is required",
+            "matchKind": "missing"
+          }
+        ]
+      },
+      {
+        "id": "evidence",
+        "label": "Resume evidence",
+        "weight": 5,
+        "applicable": true,
+        "earned": 1,
+        "possible": 1,
+        "score": 100,
+        "effectiveWeight": 5,
+        "contribution": 5,
+        "deductions": []
+      }
+    ],
+    "criteria": [
+      {
+        "category": "required",
+        "name": "React",
+        "alternatives": [
+          "React"
+        ],
+        "status": "matched",
+        "resumeEvidence": "Built Campus Events, a React app where students filter club events.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "explanation": "Your resume directly shows React.",
+        "id": "q:react",
+        "matchKind": "exact"
+      },
+      {
+        "category": "required",
+        "name": "JavaScript",
+        "alternatives": [
+          "JavaScript"
+        ],
+        "status": "matched",
+        "resumeEvidence": "Used JavaScript array methods to filter events by date and club.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "explanation": "Your resume directly shows JavaScript.",
+        "id": "q:javascript",
+        "matchKind": "exact"
+      },
+      {
+        "category": "required",
+        "name": "CSS",
+        "alternatives": [
+          "CSS"
+        ],
+        "status": "matched",
+        "resumeEvidence": "Styled the event cards with CSS so the page works on a phone.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "explanation": "Your resume directly shows CSS.",
+        "id": "q:css",
+        "matchKind": "exact"
+      },
+      {
+        "category": "required",
+        "name": "Git",
+        "alternatives": [
+          "Git"
+        ],
+        "status": "missing",
+        "resumeEvidence": "",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "explanation": "No supporting resume evidence was found for Git.",
+        "id": "q:git",
+        "matchKind": "missing"
+      },
+      {
+        "category": "required",
+        "name": "REST APIs",
+        "alternatives": [
+          "REST APIs"
+        ],
+        "status": "missing",
+        "resumeEvidence": "",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "explanation": "No supporting resume evidence was found for REST APIs.",
+        "id": "q:rest api",
+        "matchKind": "missing"
+      },
+      {
+        "category": "preferred",
+        "name": "TypeScript",
+        "alternatives": [
+          "TypeScript"
+        ],
+        "status": "partial",
+        "resumeEvidence": "Skills: HTML, CSS, JavaScript, React, Node.js.",
+        "jdEvidence": "Preferred: TypeScript and Docker.",
+        "explanation": "JavaScript provides related knowledge; it does not demonstrate TypeScript.",
+        "id": "q:typescript",
+        "matchKind": "partial"
+      },
+      {
+        "category": "preferred",
+        "name": "Docker",
+        "alternatives": [
+          "Docker"
+        ],
+        "status": "missing",
+        "resumeEvidence": "",
+        "jdEvidence": "Preferred: TypeScript and Docker.",
+        "explanation": "No supporting resume evidence was found for Docker.",
+        "id": "q:docker",
+        "matchKind": "missing"
+      },
+      {
+        "category": "projects",
+        "name": "Responsive web project",
+        "alternatives": [],
+        "status": "matched",
+        "resumeEvidence": "Styled the event cards with CSS so the page works on a phone.",
+        "jdEvidence": "Show a responsive web project in your portfolio.",
+        "explanation": "Campus Events demonstrates a responsive web project.",
+        "id": "projects:show a responsive web project in your portfolio",
+        "matchKind": "exact"
+      },
+      {
+        "category": "experience",
+        "name": "Team collaboration",
+        "alternatives": [],
+        "status": "missing",
+        "resumeEvidence": "",
+        "jdEvidence": "Experience collaborating with a team is required.",
+        "explanation": "No supporting resume evidence was found for Team collaboration.",
+        "id": "experience:experience collaborating with a team is required",
+        "matchKind": "missing"
+      },
+      {
+        "category": "evidence",
+        "name": "Portfolio evidence",
+        "alternatives": [],
+        "status": "matched",
+        "resumeEvidence": "Built Campus Events, a React app where students filter club events.",
+        "jdEvidence": "Show a responsive web project in your portfolio.",
+        "explanation": "A named project and its implementation provide concrete portfolio evidence.",
+        "id": "evidence:show a responsive web project in your portfolio",
+        "matchKind": "exact"
+      }
+    ],
+    "scoreExplanation": "An evidence-based estimate of how your resume meets this role. It is not an official ATS score.",
+    "matchingSkills": [
+      {
+        "id": "q:react",
+        "name": "React",
+        "explanation": "Your resume directly shows React.",
+        "evidence": "Built Campus Events, a React app where students filter club events.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "priority": "required",
+        "status": "matched",
+        "matchKind": "exact"
+      },
+      {
+        "id": "q:javascript",
+        "name": "JavaScript",
+        "explanation": "Your resume directly shows JavaScript.",
+        "evidence": "Used JavaScript array methods to filter events by date and club.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "priority": "required",
+        "status": "matched",
+        "matchKind": "exact"
+      },
+      {
+        "id": "q:css",
+        "name": "CSS",
+        "explanation": "Your resume directly shows CSS.",
+        "evidence": "Styled the event cards with CSS so the page works on a phone.",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "priority": "required",
+        "status": "matched",
+        "matchKind": "exact"
+      }
+    ],
+    "partialSkills": [
+      {
+        "id": "q:typescript",
+        "name": "TypeScript",
+        "explanation": "JavaScript provides related knowledge; it does not demonstrate TypeScript.",
+        "evidence": "Skills: HTML, CSS, JavaScript, React, Node.js.",
+        "jdEvidence": "Preferred: TypeScript and Docker.",
+        "priority": "preferred",
+        "status": "partial",
+        "matchKind": "partial"
+      }
+    ],
+    "missingSkills": [
+      {
+        "id": "q:git",
+        "name": "Git",
+        "explanation": "No supporting resume evidence was found for Git.",
+        "evidence": "",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "priority": "required",
+        "status": "missing",
+        "matchKind": "missing"
+      },
+      {
+        "id": "q:rest api",
+        "name": "REST APIs",
+        "explanation": "No supporting resume evidence was found for REST APIs.",
+        "evidence": "",
+        "jdEvidence": "Required skills: React, JavaScript, CSS, Git, and REST APIs.",
+        "priority": "required",
+        "status": "missing",
+        "matchKind": "missing"
+      },
+      {
+        "id": "q:docker",
+        "name": "Docker",
+        "explanation": "No supporting resume evidence was found for Docker.",
+        "evidence": "",
+        "jdEvidence": "Preferred: TypeScript and Docker.",
+        "priority": "preferred",
+        "status": "missing",
+        "matchKind": "missing"
+      }
+    ],
+    "topChanges": [
+      {
+        "title": "Develop Git",
+        "explanation": "Git is part of the role. Your resume does not yet demonstrate all of this work.",
+        "action": "Learn or obtain Git, then add a concrete example only after you can demonstrate it.",
+        "type": "learn_skill",
+        "category": "required",
+        "requirementIds": [
+          "q:git"
+        ]
+      },
+      {
+        "title": "Develop REST APIs",
+        "explanation": "REST APIs is part of the role. Your resume does not yet demonstrate all of this work.",
+        "action": "Learn or obtain REST APIs, then add a concrete example only after you can demonstrate it.",
+        "type": "learn_skill",
+        "category": "required",
+        "requirementIds": [
+          "q:rest api"
+        ]
+      },
+      {
+        "title": "Develop Team collaboration",
+        "explanation": "Team collaboration is part of the role. Your resume does not yet demonstrate all of this work.",
+        "action": "Learn or obtain Team collaboration, then add a concrete example only after you can demonstrate it.",
+        "type": "learn_skill",
+        "category": "experience",
+        "requirementIds": [
+          "experience:experience collaborating with a team is required"
+        ]
+      }
+    ]
+  },
+  "resumeText": "ALEX MORGAN\nJunior Web Developer\n\nPROFILE\nWorked on various web projects and know React.\n\nSKILLS\nSkills: HTML, CSS, JavaScript, React, Node.js.\n\nPROJECTS\nBuilt Campus Events, a React app where students filter club events.\nUsed JavaScript array methods to filter events by date and club.\nStyled the event cards with CSS so the page works on a phone.\n\nEDUCATION\nEducation project completed individually for the Web Development course.",
+  "jobDescription": "Required skills: React, JavaScript, CSS, Git, and REST APIs.\nPreferred: TypeScript and Docker.\nShow a responsive web project in your portfolio.\nExperience collaborating with a team is required."
+}
