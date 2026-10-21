@@ -30,13 +30,28 @@ test("requests the India technology feed and preserves listing fields and source
   assert.ok(options.signal instanceof AbortSignal);
   assert.deepEqual(jobs, [{
     id: "123", title: "React Developer", company: "Test Company",
-    location: "Bengaluru, India", type: "Full-time", salary: null, url: listing().url,
+    location: "Bengaluru, India", remote: false, postedAt: null, closingDate: null,
+    description: "", type: "Full-time", salary: null, url: listing().url,
   }]);
 });
 
 test("an empty feed stays empty", async (t) => {
   mockFeed(t, []);
   assert.deepEqual(await getJobs(new AbortController().signal), []);
+});
+
+test("preserves source details and dates while decoding HTML as plain text", async (t) => {
+  mockFeed(t, [listing({ postedAt: "2026-10-20", descriptionExcerpt: "<p>React &amp; CSS</p><script>bad()</script>", location: "Remote, India" })]);
+  const [job] = await getJobs(new AbortController().signal);
+  assert.equal(job.postedAt, "2026-10-20T00:00:00.000Z");
+  assert.equal(job.description, "React & CSS");
+  assert.equal(job.remote, true);
+});
+
+test("does not present overseas-only or ambiguous remote listings as India eligible", async (t) => {
+  mockFeed(t, [listing({ location: "United States" }), listing({ id: 124, location: "Remote" }), listing({ id: 125, location: "Remote, India" })]);
+  const jobs = await getJobs(new AbortController().signal);
+  assert.deepEqual(jobs.map((job) => job.id), ["125"]);
 });
 
 test("preserves supplied salary text and does not invent missing salary details", async (t) => {
