@@ -5,15 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "node --watch backend/server.js",
+    "start:api": "node backend/server.js",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test"
   },
   "dependencies": {
-    "react": "19.3.1",
-    "react-dom": "19.3.1",
+    "express": "^5.3.0",
+    "mammoth": "1.13.0",
     "pdfjs-dist": "6.4.299",
-    "mammoth": "1.13.0"
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "6.1.2",
