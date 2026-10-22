@@ -76,3 +76,15 @@ test("original fictional sample renders its score, annotations, skills and three
     assert.ok(html.includes(label));
   }
 });
+
+test("analysis loading disables both documents and exposes an accessible status", () => {
+  const html = renderToStaticMarkup(createElement(Upload, {
+    text: { resume: "Resume", job: "Job description" }, onTextChange() {}, onAnalyze() {},
+    loading: true, error: "Safe API error",
+  }));
+  assert.match(html, /id="resume-file"[^>]*disabled/);
+  assert.match(html, /id="job-file"[^>]*disabled/);
+  assert.ok(html.includes('role="status">Analyzing your documents with Groq'));
+  assert.ok(html.includes('role="alert">Safe API error'));
+  assert.ok(html.includes('aria-busy="true"'));
+});

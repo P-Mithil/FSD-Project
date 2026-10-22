@@ -1,17 +1,5 @@
 import "../Analysis.css";
-
-function locateAnnotations(text, annotations) {
-  const located = annotations
-    .map((item) => ({ ...item, start: text.indexOf(item.quote) }))
-    .filter((item) => item.quote && item.start >= 0)
-    .sort((a, b) => a.start - b.start || b.quote.length - a.quote.length);
-  let end = 0;
-  return located.filter((item) => {
-    if (item.start < end) return false;
-    end = item.start + item.quote.length;
-    return true;
-  });
-}
+import { locateAnnotations } from "../reviewAnalysis.js";
 
 const TYPE_LABELS = {
   improve_wording: "Improve wording",
@@ -28,7 +16,7 @@ const STATUS_LABELS = {
 export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) {
   const ready = Boolean(analysis);
   const data = analysis || {
-    matchScore: null, scoreExplanation: "Analysis is not connected yet. Your documents are ready for the next milestone.",
+    matchScore: null, scoreExplanation: "Analyze your resume and job description above to see their evidence-based comparison.",
     annotations: [], criteria: [], matchingSkills: [], partialSkills: [], missingSkills: [], topChanges: [],
   };
   const annotations = locateAnnotations(resumeText, data.annotations);
@@ -262,7 +250,8 @@ function AnnotatedResume({ text, annotations, byId }) {
   );
 }
 
-function FindingList({ items, tone, pending }) {  if (pending) return <p className="empty-note">Skills and supporting evidence will appear after analysis.</p>;
+function FindingList({ items, tone, pending }) {
+  if (pending) return <p className="empty-note">Skills and supporting evidence will appear after analysis.</p>;
   if (!items.length)
     return <p className="empty-note">No qualifications in this group.</p>;
   return (
