@@ -290,6 +290,9 @@ export default async function handler(req, res) {
       return res.status(200).json(analysis);
     }
   } catch (error) {
+    if (error?.cause?.code === "CERT_NOT_YET_VALID" || error?.code === "CERT_NOT_YET_VALID") {
+      return sendError(res, 502, "A secure connection to Groq could not be established because its certificate is not valid yet. Check the backend computer's date and time.");
+    }
     if (error?.name === "TimeoutError" || error?.name === "AbortError") {
       return sendError(
         res,

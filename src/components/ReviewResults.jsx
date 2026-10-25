@@ -21,6 +21,7 @@ export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) 
   };
   const annotations = locateAnnotations(resumeText, data.annotations);
   const byId = new Map(data.criteria.map((item) => [item.id, item]));
+  const strengths = data.criteria.filter(item => item.status === "matched" && item.resumeEvidence.trim()).slice(0, 3);
   const groups = [
     { title: "Matched Skills", tone: "match", items: data.matchingSkills },
     {
@@ -91,6 +92,7 @@ export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) 
             </p>
           </div>
         </div>
+        <p className="fine-print">AI interprets the document evidence; fixed rules calculate this estimate. It is not a hiring probability or independently verified ability.</p>
         {ready ? <ScoreBreakdown analysis={analysis} /> : <p className="fine-print">A score breakdown will appear after analysis.</p>}
       </section>
 
@@ -148,12 +150,35 @@ export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) 
         </section>
       </div>
 
+      {ready ? (
+        <section className="recommendations" aria-labelledby="strengths-title">
+          <div className="section-heading">
+            <p className="eyebrow">What your resume demonstrates</p>
+            <h2 id="strengths-title">Resume strengths</h2>
+          </div>
+          <div className="card">
+            {strengths.length ? (
+              <ul className="finding-list">
+                {strengths.map(item => (
+                  <li key={item.id}>
+                    <h3>{item.name}</h3>
+                    <p>{item.explanation}</p>
+                    <blockquote>{item.resumeEvidence}</blockquote>
+                    <RequirementLabels ids={[item.id]} byId={byId} />
+                  </li>
+                ))}
+              </ul>
+            ) : <p className="empty-note">No fully matched qualifications were supported by the submitted evidence. Review the partial matches and improvements below.</p>}
+          </div>
+        </section>
+      ) : null}
+
       <section
         className="recommendations"
         aria-labelledby="recommendations-title"
       >
         <div className="section-heading">
-          <p className="eyebrow">Your next steps</p>
+          <p className="eyebrow">Areas for improvement</p>
           <h2 id="recommendations-title">Top 3 improvements</h2>
         </div>
         <div className="change-grid">

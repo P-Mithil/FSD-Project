@@ -64,7 +64,7 @@ export default function App() {
         setError(data?.error || "The analysis service could not process this request. Please try again.");
         return;
       }
-      if (!isAnalysisResult(data)) {
+      if (!isAnalysisResult(data, resumeText, jobDescription)) {
         setError("The AI response was not in the expected format. Please try again.");
         return;
       }

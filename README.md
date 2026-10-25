@@ -48,4 +48,14 @@ Files are limited to 5 MB, PDFs to 20 pages, resume text to 15,000 characters an
 
 Missing/invalid keys, rate limits, timeouts, network errors and malformed model output produce readable errors. Keys and complete documents are not logged. No Jobs or homepage code is included. For deployment, route `/api/analyze` to this Node backend and page requests to the frontend; the Vite proxy is for development only.
 
+## Scores and feedback
+
+The original scoring rules are unchanged: required qualifications 45%, preferred qualifications 15%, project relevance 20%, experience relevance 15%, and resume evidence 5%. Each criterion earns 1 for matched, 0.5 for partial or 0 for missing. A category's average earns its share of the total weight. Categories the JD does not support are excluded, and their weight is redistributed among applicable categories. Rounding happens once at the end.
+
+For example, the saved fictional sample has category scores of 60%, 25%, 100%, 0%, and 100%. Its result is `round(60 × .45 + 25 × .15 + 100 × .20 + 0 × .15 + 100 × .05) = 56`. This demonstrates the formula, not a score for the user's documents.
+
+Results show matched, partial and missing qualifications, source-linked annotations, up to three evidence-backed resume strengths, and three prioritized improvement suggestions. No fully matched evidence produces an explicit empty strengths message. AI interprets the documents; the weighted score is an estimate, not a hiring probability or independently measured ability. The frontend checks score consistency and quoted evidence against the shared Resume/JD text before rendering a real response.
+
+If Node reports `CERT_NOT_YET_VALID`, compare the backend computer's date, time and timezone with the certificate's validity period. Check Windows automatic time synchronization and the Windows Time service. Do not disable certificate verification or change Git timestamps. A failed secure connection shows a readable error and preserves the previous result; it never creates a replacement score.
+
 Run `npm test` for document extraction and validation tests. No test framework dependency is required.
