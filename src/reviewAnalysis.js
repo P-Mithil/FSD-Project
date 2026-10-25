@@ -13,7 +13,7 @@ export function locateAnnotations(text, annotations) {
   });
 }
 
-export function isAnalysisResult(data) {
+export function isAnalysisResult(data, resumeText, jobDescription) {
   const text = (value) => typeof value === "string";
   const list = (items, keys) =>
     Array.isArray(items) &&
@@ -24,9 +24,9 @@ export function isAnalysisResult(data) {
       data.matchScore >= 0 &&
       data.matchScore <= 100 &&
       text(data.scoreExplanation) &&
-      list(data.matchingSkills, ["name", "explanation", "evidence"]) &&
-      list(data.missingSkills, ["name", "explanation", "evidence"]) &&
-      list(data.partialSkills, ["name", "explanation", "evidence"]) &&
+      list(data.matchingSkills, ["id", "name", "explanation", "evidence", "jdEvidence"]) &&
+      list(data.missingSkills, ["id", "name", "explanation", "evidence", "jdEvidence"]) &&
+      list(data.partialSkills, ["id", "name", "explanation", "evidence", "jdEvidence"]) &&
       list(data.criteria, [
         "category",
         "name",
@@ -36,12 +36,19 @@ export function isAnalysisResult(data) {
         "resumeEvidence",
       ]) &&
       data.criteria.length > 0 &&
+      data.criteria.every(item =>
+        typeof item.id === "string" && item.id.trim() &&
+        Array.isArray(item.alternatives) && item.alternatives.every(text) &&
+        ["matched", "partial", "missing"].includes(item.status)
+      ) &&
       Array.isArray(data.breakdown) &&
       data.breakdown.length === 5 &&
       data.breakdown.every(
         (row) =>
-          Number.isFinite(row.contribution) &&
-          Number.isFinite(row.effectiveWeight),
+          row && text(row.id) && text(row.label) &&
+          typeof row.applicable === "boolean" &&
+          ["weight", "earned", "possible", "contribution", "effectiveWeight"].every(key => Number.isFinite(row[key]) && row[key] >= 0) &&
+          (row.score === null || (Number.isFinite(row.score) && row.score >= 0 && row.score <= 100)),
       ) &&
       Math.round(
         data.breakdown.reduce((sum, row) => sum + row.contribution, 0) + 1e-10,
@@ -89,7 +96,9 @@ export function isAnalysisResult(data) {
           !byId.has(item.id) ||
           byId.get(item.id).category !== item.priority ||
           byId.get(item.id).name !== item.name ||
-          byId.get(item.id).status !== status,
+          byId.get(item.id).status !== status ||
+          byId.get(item.id).resumeEvidence !== item.evidence ||
+          byId.get(item.id).jdEvidence !== item.jdEvidence,
       )
     )
       return false;
@@ -102,6 +111,17 @@ export function isAnalysisResult(data) {
     )
   )
     return false;
+  if (typeof resumeText === "string" && typeof jobDescription === "string") {
+    if (data.criteria.some(item =>
+      !item.jdEvidence || !jobDescription.includes(item.jdEvidence) ||
+      (item.resumeEvidence && !resumeText.includes(item.resumeEvidence)) ||
+      (item.status !== "missing" && !item.resumeEvidence)
+    )) return false;
+    if (data.annotations.some(item =>
+      !item.quote || !resumeText.includes(item.quote) ||
+      !item.jdEvidence || !jobDescription.includes(item.jdEvidence)
+    )) return false;
+  }
   try {
     const expected = calculateScore(data.criteria);
     return (
@@ -109,6 +129,7 @@ export function isAnalysisResult(data) {
       expected.breakdown.every(
         (row, index) =>
           row.id === data.breakdown[index].id &&
+          ["label", "weight", "applicable", "earned", "possible"].every(key => row[key] === data.breakdown[index][key]) &&
           ["score", "effectiveWeight", "contribution"].every((key) =>
             row[key] === null
               ? data.breakdown[index][key] === null

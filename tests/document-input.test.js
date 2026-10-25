@@ -72,9 +72,18 @@ test("original fictional sample renders its score, annotations, skills and three
   assert.ok(html.includes(`Estimated match score: ${sample.analysis.matchScore} out of 100`));
   assert.equal((html.match(/class="card change-card"/g) || []).length, 3);
   assert.equal((html.match(/class="resume-highlight"/g) || []).length, 2);
+  assert.ok(html.includes("Resume strengths"));
+  assert.ok(html.includes("Areas for improvement"));
+  assert.ok(html.includes("fixed rules calculate this estimate"));
   for (const label of ["Matched Skills", "Partially Matched Skills", "Missing Skills", "How was this score calculated?"]) {
     assert.ok(html.includes(label));
   }
+});
+
+test("feedback with no fully matched evidence never invents a resume strength", () => {
+  const analysis = { ...sample.analysis, criteria: sample.analysis.criteria.map(item => ({ ...item, status: "missing" })) };
+  const html = renderToStaticMarkup(createElement(ReviewResults, { ...sample, analysis }));
+  assert.ok(html.includes("No fully matched qualifications were supported"));
 });
 
 test("analysis loading disables both documents and exposes an accessible status", () => {

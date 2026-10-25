@@ -63,7 +63,7 @@ test("Express analysis route validates inputs and handles Groq responses safely"
       const res = await post();
       assert.equal(res.status, 200);
       const data = await res.json();
-      assert.ok(isAnalysisResult(data));
+      assert.ok(isAnalysisResult(data, input.resumeText, input.jobDescription));
       assert.equal(data.matchScore, sample.analysis.matchScore);
       assert.equal(calls(), 1);
       assert.ok(!JSON.stringify(data).includes("test-placeholder"));
@@ -118,6 +118,15 @@ test("Express analysis route validates inputs and handles Groq responses safely"
         });
       }
     });
+    await t.test("certificate date failures give an actionable error without bypassing TLS", () => check(
+      () => { throw new TypeError("fetch failed", { cause: { code: "CERT_NOT_YET_VALID" } }); },
+      async (post, calls) => {
+        const res = await post();
+        assert.equal(res.status, 502);
+        assert.match((await res.json()).error, /date and time/);
+        assert.equal(calls(), 1);
+      },
+    ));
   } finally {
     globalThis.fetch = networkFetch;
     if (key === undefined) delete process.env.GROQ_API_KEY;
