@@ -65,10 +65,6 @@
   font-weight: 600;
 }
 
-.tag-missing {
-  border: 1px solid #ffffff;
-}
-
 blockquote {
   margin: 8px 0 0;
   padding-left: 12px;
@@ -84,6 +80,8 @@ blockquote {
   margin-bottom: 10px;
   border-radius: 50%;
   font-weight: 700;
+  background: #d9f6e3;
+  color: #185d36;
 }
 
 .score-breakdown {
@@ -141,10 +139,6 @@ blockquote {
   gap: 12px;
   padding-bottom: 18px;
   border-bottom: 1px solid #d8d0c8;
-}
-.resume-paper .eyebrow {
-  color: #75685f;
-  font-size: 0.7rem;
 }
 .review-badge {
   display: inline-block;
@@ -204,7 +198,7 @@ blockquote {
 }
 .tag-missing {
   color: #ffadb6;
-  border-color: #b8354566;
+  border: 1px solid #b8354566;
   background: #b835451a;
 }
 .tag-match {
@@ -213,10 +207,6 @@ blockquote {
 }
 .change-card {
   border-top: 2px solid #378455;
-}
-.change-number {
-  background: #d9f6e3;
-  color: #185d36;
 }
 .review-layout p,
 .review-layout blockquote {

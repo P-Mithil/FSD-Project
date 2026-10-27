@@ -93,7 +93,7 @@ export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) 
           </div>
         </div>
         <p className="fine-print">AI interprets the document evidence; fixed rules calculate this estimate. It is not a hiring probability or independently verified ability.</p>
-        {ready ? <ScoreBreakdown analysis={analysis} /> : <p className="fine-print">A score breakdown will appear after analysis.</p>}
+        {ready ? <ScoreBreakdown analysis={analysis} byId={byId} /> : <p className="fine-print">A score breakdown will appear after analysis.</p>}
       </section>
 
       <div className="review-layout">
@@ -323,7 +323,7 @@ function FindingList({ items, tone, pending }) {
   );
 }
 
-function ScoreBreakdown({ analysis }) {
+function ScoreBreakdown({ analysis, byId }) {
   const applicable = analysis.breakdown.filter((row) => row.applicable);
   const weightTotal = applicable.reduce((sum, row) => sum + row.weight, 0);
   const terms = applicable
@@ -381,7 +381,7 @@ function ScoreBreakdown({ analysis }) {
             <div className="deduction-item" key={item.id}>
               <RequirementLabels
                 ids={[item.id]}
-                byId={new Map([[item.id, item]])}
+                byId={byId}
               />
               <p>
                 {STATUS_LABELS[item.status]} ·{" "}

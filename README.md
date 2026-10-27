@@ -58,4 +58,10 @@ Results show matched, partial and missing qualifications, source-linked annotati
 
 If Node reports `CERT_NOT_YET_VALID`, compare the backend computer's date, time and timezone with the certificate's validity period. Check Windows automatic time synchronization and the Windows Time service. Do not disable certificate verification or change Git timestamps. A failed secure connection shows a readable error and preserves the previous result; it never creates a replacement score.
 
+## Final integration check
+
+The upload and analysis features share the same App text state; extraction and validation stay in the existing upload components. Groq is the only AI provider. The saved, clearly labeled sample remains useful for reviewing the UI offline and never replaces a failed live request automatically. The final cleanup reuses the existing requirement lookup for score deductions and consolidates duplicate result styles without changing the design.
+
+Automated tests cover valid and malformed API responses, missing keys, rate limits, certificate failures, weighted scoring and feedback rendering. Live Groq verification still requires a configured local backend key and a valid TLS connection; a passing mocked test is not proof of live API access.
+
 Run `npm test` for document extraction and validation tests. No test framework dependency is required.
