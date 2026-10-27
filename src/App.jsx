@@ -84,7 +84,15 @@ export default function App() {
   if (path === "/" || path === "/analyze") {
     return (
       <>
-        <Upload text={text} onTextChange={updateText} onShowDemo={() => setShowSample(value => !value)} showSample={showSample} onAnalyze={analyze} loading={loading} error={error} />
+        <Upload
+          text={text}
+          onTextChange={updateText}
+          onShowDemo={() => setShowSample(value => !value)}
+          showSample={showSample}
+          onAnalyze={analyze}
+          loading={loading}
+          error={error}
+        />
         <ReviewResults
           analysis={showSample ? sample.analysis : analysis}
           isDemo={showSample}

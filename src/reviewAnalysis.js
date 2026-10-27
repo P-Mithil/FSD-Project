@@ -65,10 +65,7 @@ export function isAnalysisResult(data, resumeText, jobDescription) {
   );
   if (!basic) return false;
   const byId = new Map(data.criteria.map((item) => [item.id, item]));
-  if (
-    byId.size !== data.criteria.length ||
-    data.criteria.some((item) => typeof item.id !== "string")
-  )
+  if (byId.size !== data.criteria.length)
     return false;
   const skills = [
     ...data.matchingSkills,
