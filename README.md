@@ -1,5 +1,9 @@
 # ResuMate
 
+Moiz's first homepage milestone restores the original hero, black/red styling, Outfit typography, Spline robot scene, feature cards and About content. `/` shows the homepage; `/analyze` keeps Sanjay's upload and Nishal's analysis feature. Homepage CSS is scoped to avoid changing the analysis UI. The original Spline viewer loads from its CDN only when the homepage mounts; its scene requires network access.
+
+Navigation enhancements, the original scroll-preview section and final responsive refinements remain for later homepage milestones. Jobs links retain their original `/jobs` destination for future integration; this branch does not contain Mithil's Jobs feature. No backend or scoring changes are included in this homepage milestone.
+
 Resume and Job Description upload with Nishal's Groq integration milestone. Open `/analyze` (or `/`) to upload PDF/DOCX files or paste text. PDF.js and Mammoth extract text in the browser. Clicking Analyze Resume sends both texts to the Express backend, which calls Groq and validates the response before displaying it.
 
 ## Run locally
