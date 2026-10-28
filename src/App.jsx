@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import Upload from "./pages/Upload.jsx";
+import Home from "./pages/Home.jsx";
 import { ReviewResults } from "./components/ReviewResults.jsx";
 import sample from "./sampleAnalysis.json";
 import { isAnalysisResult } from "./reviewAnalysis.js";
@@ -81,7 +82,8 @@ export default function App() {
   }
 
   const path = window.location.pathname;
-  if (path === "/" || path === "/analyze") {
+  if (path === "/") return <Home />;
+  if (path === "/analyze") {
     return (
       <>
         <Upload
