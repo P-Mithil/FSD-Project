@@ -386,3 +386,152 @@
 
 @media (max-width: 980px) { .home-page .hero-side { grid-column: 1; grid-row: auto; } }
 @media (prefers-reduced-motion: reduce) { .home-page .button { transition: none; } .home-page .hero-glow { display: none; } }
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: -51px;
+  padding: 14px 5vw;
+  background: transparent;
+}
+
+.site-nav.is-scrolled {
+  background: rgba(5, 5, 5, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.site-nav .logo {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.site-nav .nav-links {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  transform: translateX(-50%);
+}
+
+.site-nav .nav-links a {
+  padding: 8px 16px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-nav .nav-links a:hover {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.site-nav .menu-button {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.site-nav .menu-button span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #ffffff;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+.site-nav {
+  --line: rgba(255,255,255,.16);
+  --accent-soft: #e53e5012;
+  --accent-text: #ff9aa5;
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  line-height: normal;
+}
+.site-nav .nav-links span { padding: 8px 16px; color: #a3a3a3; }
+.site-nav a:focus-visible, .site-nav button:focus-visible { outline: 2px solid #ff9aa5; outline-offset: 3px; }
+.home-page [aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
+.home-page .button[aria-disabled="true"]:hover { transform: none; background: var(--accent); }
+
+.home-page .scroll-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 64rem;
+  padding: 5rem;
+}
+.home-page .mate-corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(480px 400px at 100% 0, #b81e2e80, #78101c33 42%, transparent 72%), radial-gradient(480px 400px at 0 100%, #b81e2e75, #78101c2e 42%, transparent 72%);
+}
+.home-page .preview-content { position: relative; width: 100%; padding: 6rem 0; perspective: 1000px; }
+.home-page .preview-heading { max-width: 64rem; margin: auto; text-align: center; transform: translateY(calc(-100px * var(--progress))); }
+.home-page .preview-heading h2 { font-size: 3.75rem; line-height: .95; font-weight: 700; }
+.home-page .preview-frame {
+  height: 36rem;
+  max-width: 64rem;
+  margin: -3rem auto 0;
+  padding: 1.5rem;
+  border: 4px solid #e53e5045;
+  border-radius: 30px;
+  background: #150b0d;
+  box-shadow: 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a;
+  transform: rotateX(calc(20deg * (1 - var(--progress)))) scale(calc(1.05 - .05 * var(--progress)));
+}
+.home-page .preview-paper { height: 100%; display: flex; flex-direction: column; overflow: hidden; padding: 2.25rem 2.5rem; border-radius: 16px; background: #0c0c0c; }
+.home-page .preview-paper header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #ffffff1a; padding-bottom: .75rem; }
+.home-page .preview-paper h3 { font-size: 1.875rem; letter-spacing: -.03em; }
+.home-page .preview-paper header p { font-size: .875rem; color: #a3a3a3; margin: .25rem 0 0; }
+.home-page .preview-paper .preview-privacy { text-align: right; font-size: .75rem; }
+.home-page .preview-description { max-width: 48rem; margin: 1rem 0 0; font-size: 15px; color: #c8c8c8; line-height: 1.5rem; }
+.home-page .preview-highlights { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .5rem; list-style: none; margin: 1rem 0 0; padding: 0; }
+.home-page .preview-highlights li { padding: .75rem; background: #151515; border-radius: 12px; }
+.home-page .preview-highlights strong, .home-page .preview-highlights span { display: block; }
+.home-page .preview-highlights span { margin-top: .25rem; font-size: .75rem; color: #a3a3a3; }
+.home-page .preview-example { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .5rem; margin-top: 1rem; }
+.home-page .preview-example p { padding: .75rem; margin: 0; border-radius: 12px; font-size: .875rem; background: #151515; }
+.home-page .preview-example p:first-child { background: #e53e5012; }
+.home-page .preview-example strong { display: block; margin-bottom: .25rem; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; }
+.home-page .preview-example p:first-child strong { color: #ff9aa5; }
+.home-page .preview-note { margin: auto 0 0; padding-top: .75rem; font-size: .75rem; color: #a3a3a3; }
+
+@media (max-width: 860px) {
+  .site-nav .menu-button { display: flex; }
+  .site-nav .nav-links { display: none; left: auto; right: 6vw; top: 70px; min-width: 180px; transform: none; flex-direction: column; padding: 12px; border: 1px solid #ffffff29; border-radius: 16px; background: #0a0a0a; }
+  .site-nav .nav-links.open { display: flex; }
+}
+@media (max-width: 768px) {
+  .home-page .scroll-preview { min-height: 52rem; padding: .5rem; }
+  .home-page .preview-content { padding: 2.5rem 0; }
+  .home-page .preview-heading h2 { font-size: 2.25rem; }
+  .home-page .preview-frame { height: auto; min-height: 30rem; padding: .5rem; transform: rotateX(calc(20deg * (1 - var(--progress)))) scale(calc(.7 + .2 * var(--progress))); }
+  .home-page .preview-paper { padding: 1rem; }
+  .home-page .preview-paper h3 { font-size: 1.5rem; }
+  .home-page .preview-highlights { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .home-page .preview-example { grid-template-columns: minmax(0,1fr); }
+  .home-page .preview-paper .preview-privacy { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .home-page .preview-heading, .home-page .preview-frame { transform: none; }
+}

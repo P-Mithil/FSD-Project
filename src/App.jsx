@@ -1,12 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Upload from "./pages/Upload.jsx";
 import Home from "./pages/Home.jsx";
 import { ReviewResults } from "./components/ReviewResults.jsx";
 import sample from "./sampleAnalysis.json";
 import { isAnalysisResult } from "./reviewAnalysis.js";
 import { retryAfterSeconds } from "./retry.js";
+import Navbar from "./components/Navbar.jsx";
 
 export default function App() {
+  const [path, setPath] = useState(window.location.pathname);
   const [text, setText] = useState({ resume: "", job: "" });
   const [showSample, setShowSample] = useState(false);
   const [analysis, setAnalysis] = useState(null);
@@ -14,6 +16,30 @@ export default function App() {
   const [error, setError] = useState("");
   const request = useRef(0);
   const retryAt = useRef(0);
+  useEffect(() => {
+    function back() { setPath(window.location.pathname); }
+    window.addEventListener("popstate", back);
+    return () => window.removeEventListener("popstate", back);
+  }, []);
+
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (["home", "about", "preview", "results"].includes(id)) {
+      document.getElementById(id)?.scrollIntoView();
+    }
+  }, [path]);
+
+  function navigate(event) {
+    const link = event.target.closest?.("a[href]");
+    if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;
+    const url = new URL(link.href);
+    if (url.origin !== window.location.origin || !["/", "/analyze"].includes(url.pathname)) return;
+    if (url.pathname === path && url.hash) return;
+    event.preventDefault();
+    window.history.pushState({}, "", url.pathname + url.hash);
+    setPath(url.pathname);
+    if (!url.hash) window.scrollTo({ top: 0, behavior: "instant" });
+  }
   function updateText(kind, value) {
     request.current++;
     setText(prev => ({ ...prev, [kind]: value }));
@@ -81,11 +107,11 @@ export default function App() {
     }
   }
 
-  const path = window.location.pathname;
-  if (path === "/") return <Home />;
-  if (path === "/analyze") {
-    return (
-      <>
+  return (
+    <div onClick={navigate}>
+      <Navbar path={path} />
+      {path === "/" ? <Home /> : null}
+      {path === "/analyze" ? <>
         <Upload
           text={text}
           onTextChange={updateText}
@@ -101,13 +127,11 @@ export default function App() {
           resumeText={showSample ? sample.resumeText : text.resume}
           jobDescription={showSample ? sample.jobDescription : text.job}
         />
-      </>
-    );
-  }
-  return (
-    <main>
+      </> : null}
+      {!["/", "/analyze"].includes(path) ? <main>
       <h1>Page not found</h1>
       <a href="/analyze">Open resume upload</a>
-    </main>
+      </main> : null}
+    </div>
   );
 }
