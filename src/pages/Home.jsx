@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../Home.css";
+import { Preview } from "../components/Preview.jsx";
 
 const SPLINE_SCENE =
   "https://prod.spline.design/NSunQWiBbFevQ7m4/scene.splinecode";
@@ -9,6 +10,7 @@ export default function Home() {
     <main className="home-page">
       <Hero />
       <FeatureCards />
+      <Preview />
       <About />
     </main>
   );
@@ -104,9 +106,9 @@ function FeatureCards() {
           Upload your resume and discover real job opportunities ranked by how
           well they match your skills.
         </p>
-        <a className="button button-accent" href="/jobs">
+        <span className="button button-accent" aria-disabled="true" title="Live Jobs will be available after its feature is integrated.">
           Find Matching Jobs
-        </a>
+        </span>
       </article>
     </section>
   );
@@ -172,9 +174,9 @@ function About() {
               source.
             </li>
           </ul>
-          <a className="about-link" href="/jobs">
+          <span className="about-link" aria-disabled="true" title="Live Jobs will be available after its feature is integrated.">
             Explore job opportunities ↗
-          </a>
+          </span>
         </article>
       </div>
       <dl className="about-principles">

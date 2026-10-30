@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DocumentInput } from "../components/DocumentInput.jsx";
 import { MAX_FILE_BYTES } from "../pdfValidation.js";
 import "../Upload.css";
@@ -8,6 +8,10 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
   const [errors, setErrors] = useState({ resume: "", job: "" });
   const [reading, setReading] = useState({ resume: false, job: false });
   const uploads = useRef({ resume: 0, job: 0 });
+  useEffect(() => () => {
+    uploads.current.resume++;
+    uploads.current.job++;
+  }, []);
 
   function editText(kind, value) {
     uploads.current[kind]++;
