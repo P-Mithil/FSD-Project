@@ -42,8 +42,12 @@ export default function Jobs() {
   }
 
   const results = filterJobs(jobs, query);
-  const hasFutureDates = jobs.some((job) => job.postedAt && Date.parse(job.postedAt) > Date.now());
   return (
+    <div className="jobs-page">
+      <header className="jobs-header">
+        <a className="jobs-logo" href="/jobs">Resume Mate</a>
+        <span>Live Jobs</span>
+      </header>
     <main className="panel-section smart-jobs" aria-labelledby="live-jobs-title">
       <div className="smart-jobs-heading">
         <div>
@@ -151,10 +155,6 @@ export default function Jobs() {
       <p className="smart-privacy">
         Listings are for browsing. Resume matching and compatibility scores are not available in this milestone.
       </p>
-      {hasFutureDates ? <p className="match-warning" role="status">
-        Some source posting dates are later than this computer's date. Recent posting windows exclude them;
-        choose Any date / date unavailable to inspect those source records.
-      </p> : null}
       {loading ? <p className="smart-loading" role="status">Loading live job listings…</p> : null}
       {error ? (
         <div className="error-box" role="alert">
@@ -189,6 +189,11 @@ export default function Jobs() {
         Freshers / junior mode hides explicit senior titles; confirm all eligibility requirements on the source.
       </p> : null}
     </main>
+      <footer className="jobs-footer">
+        <p>Resume Mate</p>
+        <p>Live Indian technology jobs · Dev Global Jobs</p>
+      </footer>
+    </div>
   );
 }
 
@@ -197,6 +202,9 @@ function JobCard({ job }) {
   return (
     <article
       className={`smart-job ${details ? "score-open" : ""}`}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setDetails(false);
+      }}
       tabIndex={0}
       aria-label={`${job.title} at ${job.company}`}
       onClick={(event) => {

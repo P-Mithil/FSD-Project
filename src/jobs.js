@@ -89,11 +89,14 @@ export async function getJobs(signal) {
       continue;
     }
 
+    const url = getLink(job.url);
+    if (!url) continue;
     const location = getText(job.location, "Location not provided");
     const remote = /\bremote\b/i.test(location + " " + job.title) || job.category === "remote";
     if (!isIndiaEligible(location, remote)) continue;
     const postedAt = typeof job.postedAt === "string" && Number.isFinite(Date.parse(job.postedAt))
       ? new Date(job.postedAt).toISOString() : null;
+    if (postedAt && Date.parse(postedAt) > Date.now() + 5 * 60000) continue;
     const closingDate = typeof job.closingDate === "string" && Number.isFinite(Date.parse(job.closingDate))
       ? new Date(job.closingDate).toISOString() : null;
 
@@ -108,7 +111,7 @@ export async function getJobs(signal) {
       description: descriptionText(job.description ?? job.descriptionExcerpt),
       type: getText(job.jobType, "Employment type not provided"),
       salary: getText(job.salary, "") || null,
-      url: getLink(job.url),
+      url,
     });
   }
   return [...jobs.values()];
