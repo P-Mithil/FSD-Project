@@ -1,129 +1,101 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getJobs } from "../src/jobs.js";
+import { normalizeJobs, createSource } from "../backend/jobSources.js";
 
+const now = Date.parse("2026-10-30T12:00:00Z");
 const listing = (changes = {}) => ({
-  id: 123,
-  title: "React Developer",
-  organization: "Test Company",
-  location: "Bengaluru, India",
-  jobType: "Full-time",
-  country: "IN",
-  url: "https://devglobaljobs.com/jobs/detail/123",
-  ...changes,
+  id: 123, title: "React Developer", organization: "Test Company",
+  location: "Bengaluru, India", jobType: "Full-time", country: "IN",
+  url: "https://devglobaljobs.com/jobs/detail/123", ...changes,
 });
+const feed = (jobs) => Response.json({ meta: { hasMore: false }, jobs });
 
-function mockFeed(t, jobs) {
-  return t.mock.method(globalThis, "fetch", async () =>
-    Response.json({ jobs }),
-  );
-}
-
-test("requests the India technology feed and preserves listing fields and source URLs", async (t) => {
-  const mock = mockFeed(t, [listing()]);
-  const jobs = await getJobs(new AbortController().signal);
-  const [url, options] = mock.mock.calls[0].arguments;
-  const query = new URL(url).searchParams;
+test("backend requests the India technology feed and preserves fields and source URLs", async () => {
+  const calls = [];
+  const source = createSource({ now: () => now, fetchJobs: async (url, options) => {
+    calls.push({ url, options });
+    return feed([listing()]);
+  } });
+  const { jobs } = await source.search();
+  const query = new URL(calls[0].url).searchParams;
   assert.equal(query.get("country"), "IN");
   assert.equal(query.get("category"), "technology");
   assert.equal(query.get("limit"), "100");
-  assert.ok(options.signal instanceof AbortSignal);
-  assert.deepEqual(jobs, [{
-    id: "123", title: "React Developer", company: "Test Company",
-    location: "Bengaluru, India", remote: false, postedAt: null, closingDate: null,
-    description: "", type: "Full-time", salary: null, url: listing().url,
-  }]);
+  assert.ok(calls[0].options.signal instanceof AbortSignal);
+  assert.equal(jobs[0].company, "Test Company");
+  assert.equal(jobs[0].jobType, "Full-time");
+  assert.equal(jobs[0].url, listing().url);
+  assert.equal(jobs[0].salary, null);
 });
 
-test("an empty feed stays empty", async (t) => {
-  mockFeed(t, []);
-  assert.deepEqual(await getJobs(new AbortController().signal), []);
+test("empty feeds stay empty and missing descriptions never become invented evidence", async () => {
+  const source = createSource({ fetchJobs: async () => feed([]) });
+  assert.deepEqual((await source.search()).jobs, []);
+  const [job] = normalizeJobs([listing()], now);
+  assert.equal(job.description, "");
+  assert.equal(job.fullDescription, false);
 });
 
-test("preserves source details and dates while decoding HTML as plain text", async (t) => {
-  mockFeed(t, [listing({ postedAt: "2026-10-20", descriptionExcerpt: "<p>React &amp; CSS</p><script>bad()</script>", location: "Remote, India" })]);
-  const [job] = await getJobs(new AbortController().signal);
+test("source details and dates remain plain text", () => {
+  const [job] = normalizeJobs([listing({ postedAt: "2026-10-20", location: "Remote, India",
+    descriptionExcerpt: "<p>React &amp; CSS</p><script>bad()</script>" })], now);
   assert.equal(job.postedAt, "2026-10-20T00:00:00.000Z");
   assert.equal(job.description, "React & CSS");
   assert.equal(job.remote, true);
 });
 
-test("does not present overseas-only or ambiguous remote listings as India eligible", async (t) => {
-  mockFeed(t, [listing({ location: "United States" }), listing({ id: 124, location: "Remote" }), listing({ id: 125, location: "Remote, India" })]);
-  const jobs = await getJobs(new AbortController().signal);
+test("overseas-only and ambiguous remote rows are not represented as India eligible", () => {
+  const jobs = normalizeJobs([listing({ location: "United States" }),
+    listing({ id: 124, location: "Remote" }), listing({ id: 125, location: "Remote, India" })], now);
   assert.deepEqual(jobs.map((job) => job.id), ["125"]);
 });
 
-test("preserves supplied salary text and does not invent missing salary details", async (t) => {
-  mockFeed(t, [
-    listing({ salary: "  INR 600,000–900,000 per year  " }),
-    listing({ id: 124, salary: null }),
-    listing({ id: 125, salary: " " }),
-    listing({ id: 126, salary: 900000 }),
-  ]);
-  const jobs = await getJobs(new AbortController().signal);
-  assert.deepEqual(jobs.map((job) => job.salary), [
-    "INR 600,000–900,000 per year", null, null, null,
-  ]);
+test("salary text is preserved without inventing currency or missing salaries", () => {
+  const jobs = normalizeJobs([listing({ salary: "INR 600,000–900,000 per year" }),
+    listing({ id: 124, salary: null }), listing({ id: 125, salary: " " }),
+    listing({ id: 126, salary: 900000 })], now);
+  assert.deepEqual(jobs.map((job) => job.salary), ["INR 600,000–900,000 per year", null, null, null]);
 });
 
-test("labels absent fields and never exposes unsafe application URLs", async (t) => {
-  mockFeed(t, [
-    listing({ organization: null, location: "", jobType: null }),
-    listing({ id: 127, url: "javascript:alert(1)" }),
-    listing({ id: 124, url: "https://evil.test/jobs/detail/124" }),
-    listing({ id: 125, url: null }),
-  ]);
-  const jobs = await getJobs(new AbortController().signal);
-  assert.equal(jobs[0].company, "Company not provided");
-  assert.equal(jobs[0].location, "Location not provided");
-  assert.equal(jobs[0].type, "Employment type not provided");
+test("missing fields use the original fallbacks and unsafe application URLs are rejected", () => {
+  const jobs = normalizeJobs([listing({ organization: null, jobType: null }),
+    listing({ id: 124, url: "javascript:alert(1)" }),
+    listing({ id: 125, url: "https://evil.test/jobs/detail/125" }), listing({ id: 126, url: null })], now);
   assert.equal(jobs.length, 1);
-  assert.equal(jobs[0].url, listing().url);
+  assert.equal(jobs[0].company, "Company not supplied");
+  assert.equal(jobs[0].jobType, "Not specified");
 });
 
-test("omits expired, invalid and foreign rows and deduplicates IDs", async (t) => {
-  mockFeed(t, [listing(), listing(), null, listing({ id: "bad" }),
+test("duplicates, invalid, expired, foreign and future-dated rows are excluded", () => {
+  const jobs = normalizeJobs([listing(), listing(), null, listing({ id: "bad" }),
     listing({ id: 124, title: "" }), listing({ id: 125, country: "US" }),
-    listing({ id: 126, closingDate: "2000-01-01" })]);
-  const jobs = await getJobs(new AbortController().signal);
+    listing({ id: 126, closingDate: "2000-01-01" }), listing({ id: 127, postedAt: "2026-11-05" })], now);
   assert.equal(jobs.length, 1);
 });
 
-test("provider failures use safe messages and never automatically retry", async (t) => {
+test("provider failures return safe errors with no automatic retries", async () => {
   for (const status of [429, 500]) {
-    const mock = t.mock.method(globalThis, "fetch", async () =>
-      Response.json({ error: "Internal provider detail" }, { status }),
-    );
-    await assert.rejects(getJobs(new AbortController().signal),
-      status === 429 ? /service is busy/ : /could not be loaded/);
-    assert.equal(mock.mock.callCount(), 1);
-    mock.mock.restore();
+    let calls = 0;
+    const source = createSource({ fetchJobs: async () => {
+      calls++;
+      return Response.json({ error: "Internal provider detail" }, { status });
+    } });
+    await assert.rejects(source.search(), (error) => error.status === (status === 429 ? 429 : 502)
+      && !error.message.includes("Internal provider detail"));
+    assert.equal(calls, 1);
   }
 });
 
-test("malformed JSON and unsupported response shapes are errors, not empty feeds", async (t) => {
+test("invalid JSON and unsupported payloads are errors rather than empty feeds", async () => {
   for (const body of ["bad JSON", "{}", '{"jobs":null}']) {
-    const mock = t.mock.method(globalThis, "fetch", async () => new Response(body));
-    await assert.rejects(getJobs(new AbortController().signal), /unexpected response/);
-    mock.mock.restore();
+    const source = createSource({ fetchJobs: async () => new Response(body) });
+    await assert.rejects(source.search(), (error) => error.status === 502);
   }
 });
 
-test("network errors and cancellation are passed to the page without a retry", async (t) => {
-  const mock = t.mock.method(globalThis, "fetch", async (_url, options) => {
-    options.signal.throwIfAborted();
-    throw new TypeError("Network unavailable");
-  });
-  const request = new AbortController();
-  await assert.rejects(getJobs(request.signal), TypeError);
-  request.abort();
-  await assert.rejects(getJobs(request.signal), { name: "AbortError" });
-  assert.equal(mock.mock.callCount(), 2);
-});
-
-test("future-dated listings are excluded even when browsing any date", async (t) => {
-  mockFeed(t, [listing(), listing({ id: 124, postedAt: new Date(Date.now() + 86400000).toISOString() })]);
-  const jobs = await getJobs(new AbortController().signal);
-  assert.deepEqual(jobs.map((job) => job.id), ["123"]);
+test("network errors are safe and are not retried automatically", async () => {
+  let calls = 0;
+  const source = createSource({ fetchJobs: async () => { calls++; throw new TypeError("Network unavailable"); } });
+  await assert.rejects(source.search(), (error) => error.status === 502 && /Could not reach/.test(error.message));
+  assert.equal(calls, 1);
 });

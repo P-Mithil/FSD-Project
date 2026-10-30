@@ -1,59 +1,95 @@
-# ResuMate: Live Jobs
+# ResuMate Live Jobs
 
-This Live Jobs correction preserves the completed ResuMate browse UI from `E:/FSD`: Outfit typography, the black/red theme, compact rows, original filters, hover transitions, keyboard focus, mobile tap-to-expand details and reduced-motion support. Real Dev Global Jobs listings, source Apply links, company initials, salary and error/empty states remain.
+Mithil's Jobs feature reuses the completed ResuMate interface and matching implementation. Dev Global Jobs is the only external source. The black/red theme, Outfit font, compact cards, filters and original hover/focus/tap score animations are preserved. Landing and Resume Analysis pages are outside this branch.
 
 ## Run locally
 
-Use Node.js 22.13 or later. From the project root:
+Use Node.js 22.13 or later. Install once:
 
 ```sh
 npm install
+```
+
+Run these in two terminals from the project root:
+
+```sh
+npm run dev:api
+```
+
+```sh
 npm run dev
 ```
 
-Open `http://localhost:5173/jobs`. The root URL `/` also displays Jobs during this milestone. Other paths display a not-found message. Routing currently uses the browser pathname and ordinary links; no routing dependency is needed for this single page.
-
-## Build
-
-```sh
-npm run build
-npm run preview
-```
-
-Vite serves the page routes locally. A future static deployment must forward page requests to `index.html`.
-
-`src/main.jsx` starts React and `src/App.jsx` selects the route. `src/pages/Jobs.jsx` adapts the original Jobs page for browsing without resume state. `src/Jobs.css` is the preserved original Jobs stylesheet; `src/pages/Jobs.css` contains only the theme and shared control styles needed by this page. Unrelated landing and analysis code is not imported.
-
-## Jobs API
-
-`src/jobs.js` keeps the existing public API request directly in the browser. No API key, backend or new dependencies are needed for this milestone. The fixed request asks for up to 100 India technology listings. Filters apply locally within that pool; they do not search every vacancy in India. Show more reveals eight additional rows at a time without another API request.
-
-The adapter reuses the original field mapping, safe links, plain-text descriptions, duplicate/expired checks and conservative India-remote eligibility checks. Missing fields and dates are labeled rather than invented. Requests time out after 15 seconds and are cancelled on unmount; errors offer a manual retry, with no automatic loop. Expandable details show the supplied description or excerpt, closing date when provided, and source attribution. Apply opens the original provider page for complete requirements.
-
-Visible attribution and original application URLs are preserved. The provider permits internal, research and non-commercial use within its rate limit; see its [API documentation and usage terms](https://devglobaljobs.com/developers). An internet connection is required for listings and the original Google Fonts Outfit stylesheet.
-
-## Tests
+Open the Vite URL printed in the terminal, followed by `/jobs`. `/` also opens Jobs. Vite forwards `/api` to Express on `127.0.0.1:3001`. No API key or .env file is required. Optional server settings are `HOST` and `PORT`; update the Vite proxy if changing the backend port.
 
 ```sh
 npm test
+npm run build
 ```
 
-Tests use controlled responses for successful listings, empty feeds, provider failures, missing fields, unsafe links, salary, source descriptions and dates. Filter tests cover city aliases, custom cities, India remote, employment type, posting windows, fresher exclusions, expired listings and combined empty results.
+Production hosting must serve the built frontend with an index.html fallback for `/jobs` and forward `/api/jobs` and `/api/jobs/match` to Express. `npm run preview` previews the built UI; run the API separately and configure an API reverse proxy for a deployed preview. The development server is the easiest local demo.
 
-## Filters and milestone boundaries
+## Frontend workflow
 
-Choose city (including other Indian cities or India remote), employment type, posting window and experience level, then use Browse Indian jobs to apply. City aliases reuse the original rules, including Bangalore/Bengaluru and Delhi NCR. Freshers / junior mode excludes explicit senior titles; it does not prove experience eligibility. Check the source requirements before applying.
+`src/App.jsx` chooses the Jobs route. `JobsResume.jsx` holds only Jobs resume text, upload state and the session response cache. `DocumentInput.jsx` accepts text, PDF or DOCX. The original PDF.js and Mammoth helpers extract text in the browser; documents are never saved or uploaded to a third-party service. Files must be valid, at most 5 MB, and extracted text must fit 15,000 characters. PDFs have a 20-page limit; scanned images need pasted text. DOCX archive validation limits decompression and checks the actual document content.
 
-Future-dated postings and unsafe application URLs are excluded, matching the original source validation. Any date / date unavailable includes older or undated records, but never future postings. Source dates are never altered. A provider feed dated ahead of the computer can therefore produce an empty view.
+`Jobs.jsx` sends extracted text and filters to Express. It restores automatic matching after input settles, a manual Find my matches action, ranked recommendations, circular scores, expandable required/matched/missing skills and a factor breakdown. Unscored jobs stay in Explore Other Jobs with Not evaluated, never a fabricated zero. Hover and focus reveal the existing score without any request. Mobile tap, keyboard controls and reduced-motion styling are preserved. Refresh opens a fresh Jobs session; upload again to match. Resume data is not persisted in a database or browser storage.
 
-A later matching milestone will restore resume upload/state, matching, genuine percentages, score rings, ranked recommendations and skill comparisons. This milestone has no resume controls or scoring logic. Rows say Not evaluated; this is not a zero score. The original stylesheet is preserved, including currently unused score styles, so future scoring can use the same design without another rewrite.
+## Express workflow
 
-## UI and source correction
+`backend/server.js` contains only Express setup and two routes:
 
-The Jobs card/filter stylesheet (`src/Jobs.css`) is identical to the original completed application. The Jobs-only shared styles restore the original content width, heading typography, brand header, footer and black/red colors (`#050505` and `#e53e50`). Home and Analyze navigation is intentionally absent until those pages exist in this checkout. Resume controls, matching and score percentages are deferred; cards remain Not evaluated.
+- `GET /api/jobs?city=Bengaluru&type=any&days=7&level=all` browses eligible Indian technology listings.
+- `POST /api/jobs/match` accepts JSON `{ "resumeText": "Skills: React, JavaScript...", "filters": { "city": "", "type": "any", "days": "7", "level": "all" } }` and returns `profile`, scored `results`, unscored `explore`, counts and safe warnings.
 
-Dev Global Jobs is the only external job source. There is no provider selector, fallback provider, AI request or API key in this branch. If an open page shows a Jobful/Himalayas selector, it is a different or stale application instance. Run Vite from this checkout and open the exact URL printed by Vite, rather than assuming an existing localhost tab belongs to this project.
+The three original modules are reused unchanged: `jobs.js` validates filters/resume text and orchestrates matching, `jobSources.js` fetches and normalizes Dev Global Jobs, and `score.js` extracts evidence and scores deterministically. There are no Groq calls, credentials, AI-analysis routes, databases or other providers. The superseded direct-browser jobs adapter and duplicated filters were removed.
 
-Verification: `npm test` passes 16 tests and `npm run build` succeeds. On October 30, 2026, the unfiltered live endpoint returned 100 rows dated after the computer date; all were correctly excluded. A separate React query returned 34 records, including 31 non-future records. Those real source records were used only in an isolated browser test harness to exercise cards; the production request remains the India technology feed above. No listings or scores are bundled with the application.
+The original source handling preserves attribution and original application links, rejects unsafe URLs and expired/future/overseas-only records, handles malformed responses, bounds searches to 200 listings and comparisons to 20 full descriptions, caches results/profiles, and respects provider Retry-After cooldowns without automatic retry loops. Partial results survive provider failures. Resume text is never sent to the external job source; only a derived technology/role search term is used. No complete resumes or personal information are logged.
 
-Browser checks covered desktop (1280px) and mobile (390px) without horizontal overflow, city/custom-city filters, employment and fresher filters, posting windows, pagination, keyboard Enter/Escape, focus outlines, tap-to-expand details and preserved source links. Reduced-motion rules remain in the original stylesheet.
+## Matching calculation
+
+Base weights: skills 40%, role 25%, experience 20%, location 10%, education 5%. Only applicable factors contribute to the denominator. Unknown applicant evidence earns no credit; factors absent from the job or an unselected location preference are inapplicable. Accepted alternative skills count as one requirement group. Explicitly ineligible listings are excluded. Identical evidence produces identical scores; ties use posting date and job ID.
+
+Example from the live test: the React Native Developer listing required six skill groups. The test resume demonstrated five and matched the role. Experience, education and location were inapplicable, so the score was `round(100 * (40 * 5/6 + 25) / (40 + 25)) = 90`. AWS was missing. Missing or insufficient full descriptions return no score. These are estimated compatibility scores, not hiring probabilities or official ATS scores.
+
+## Verification
+
+- 44 tests pass: strong/partial/unrelated matching, accepted alternatives, applicable weights, stable ranking (including genuine zero versus null), missing descriptions, invalid input, source errors, partial 429 results/cooldowns, caching, filter aliases, safe links and PDF/DOCX validation/extraction.
+- Production build passes; npm install reports zero known vulnerabilities.
+- Actual live matching retrieved 34 source records, scored one 90% match, left three unscored, and excluded one explicitly ineligible candidate for a fictional mobile-developer resume with seven-day/All India filters. Counts are one observed search, not a claim about every source record.
+- Browser checks verified required/matched/missing skills, genuine circular scores, unscored separation, keyboard focus, 1280px desktop and 390px mobile layouts without horizontal overflow, and successful `/jobs` refresh.
+- A PDF upload with extracted text and live results was observed in Chrome. Actual DOCX bytes pass the extraction test. Automated chooser upload verification was restricted by browser file-access permissions; a manual DOCX picker check remains advisable. No extension/security settings were changed.
+- Provider dates can be ahead of the computer date. Such records are excluded honestly; a broad browse can therefore be empty while a resume-derived search finds current older listings. Internet access and the external source's availability are required.
+
+Visible attribution and original application URLs are preserved. See [Dev Global Jobs documentation and terms](https://devglobaljobs.com/developers). Outfit is loaded from Google Fonts. No job records, API keys, generated build output or private resumes are committed.
+
+## Files in this milestone
+
+- `README.md`
+- `package.json`
+- `package-lock.json`
+- `vite.config.js`
+- `src/App.jsx`
+- `src/jobFilters.js` (superseded browser adapter removed)
+- `src/jobs.js` (superseded browser adapter removed)
+- `src/pages/Jobs.css`
+- `src/pages/Jobs.jsx`
+- `backend/jobs.js`
+- `backend/jobSources.js`
+- `backend/score.js`
+- `backend/server.js`
+- `src/components/DocumentInput.jsx`
+- `src/components/JobsResume.jsx`
+- `src/extractDocxText.js`
+- `src/extractPdfText.js`
+- `src/pdfValidation.js`
+- `src/retry.js`
+- `tests/docx.test.js`
+- `tests/fixtures/resume.docx`
+- `tests/job-filters.test.js`
+- `tests/job-sources.test.js`
+- `tests/jobs-api.test.js`
+- `tests/jobs.test.js`
+- `tests/pdf-validation.test.js`
+- `tests/retry.test.js`
+- `tests/smart-matching.test.js`
