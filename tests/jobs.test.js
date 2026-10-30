@@ -69,7 +69,8 @@ test("preserves supplied salary text and does not invent missing salary details"
 
 test("labels absent fields and never exposes unsafe application URLs", async (t) => {
   mockFeed(t, [
-    listing({ organization: null, location: "", jobType: null, url: "javascript:alert(1)" }),
+    listing({ organization: null, location: "", jobType: null }),
+    listing({ id: 127, url: "javascript:alert(1)" }),
     listing({ id: 124, url: "https://evil.test/jobs/detail/124" }),
     listing({ id: 125, url: null }),
   ]);
@@ -77,7 +78,8 @@ test("labels absent fields and never exposes unsafe application URLs", async (t)
   assert.equal(jobs[0].company, "Company not provided");
   assert.equal(jobs[0].location, "Location not provided");
   assert.equal(jobs[0].type, "Employment type not provided");
-  assert.ok(jobs.every((job) => job.url === ""));
+  assert.equal(jobs.length, 1);
+  assert.equal(jobs[0].url, listing().url);
 });
 
 test("omits expired, invalid and foreign rows and deduplicates IDs", async (t) => {
@@ -118,4 +120,10 @@ test("network errors and cancellation are passed to the page without a retry", a
   request.abort();
   await assert.rejects(getJobs(request.signal), { name: "AbortError" });
   assert.equal(mock.mock.callCount(), 2);
+});
+
+test("future-dated listings are excluded even when browsing any date", async (t) => {
+  mockFeed(t, [listing(), listing({ id: 124, postedAt: new Date(Date.now() + 86400000).toISOString() })]);
+  const jobs = await getJobs(new AbortController().signal);
+  assert.deepEqual(jobs.map((job) => job.id), ["123"]);
 });
