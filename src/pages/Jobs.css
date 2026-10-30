@@ -115,3 +115,100 @@
 }
 
 .jobs-page .smart-jobs { width: min(1120px, calc(100% - 8vw)); }
+
+.jobs-matcher { max-width: none; margin: 0; padding: 0; }
+
+.smart-jobs .card-help,
+.smart-jobs .fine-print,
+.smart-jobs .empty-note {
+  color: var(--muted);
+}
+
+.smart-jobs .card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--card);
+}
+
+.smart-jobs .card-help {
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.smart-jobs .file-status {
+  margin-bottom: 0;
+}
+
+.smart-jobs textarea:focus-visible,
+.smart-jobs input:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+
+.smart-jobs textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #000000;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.smart-jobs .document-input {
+  min-width: 0;
+}
+
+.smart-jobs .upload-area {
+  padding: 20px;
+  margin: 18px 0;
+  border: 1px dashed #ffffff38;
+  border-radius: 16px;
+  background: #ffffff03;
+}
+
+.smart-jobs .upload-area .card-help {
+  font-size: 0.85rem;
+}
+
+.smart-jobs .upload-area input {
+  display: block;
+  max-width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #b9b9b9;
+}
+
+.smart-jobs .upload-area input::file-selector-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  margin-right: 10px;
+  background: white;
+  color: black;
+  cursor: pointer;
+  font: inherit;
+}
+
+.smart-jobs .upload-area .file-status {
+  margin-top: 12px;
+  color: #aaa;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.smart-jobs .text-count {
+  margin: 8px 0 0;
+  color: #aaa;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.smart-jobs .over-limit {
+  color: #ffa6ad;
+}
+
+.smart-jobs .upload-label, .smart-jobs .text-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }

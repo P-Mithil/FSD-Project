@@ -1,10 +1,10 @@
-import Jobs from "./pages/Jobs.jsx";
+import JobsResume from "./components/JobsResume.jsx";
 
 export default function App() {
   const path = window.location.pathname;
 
   if (path === "/" || path === "/jobs") {
-    return <Jobs />;
+    return <JobsResume />;
   }
 
   return (
