@@ -190,3 +190,23 @@ test("Express rejects malformed, oversized and invalid requests without calling 
     assert.equal(calls, 0);
   });
 });
+
+test("truncated descriptions produce labeled estimates from explicit available requirements", async () => {
+  const partial = "Required qualifications\nReact, JavaScript and Python required. " + "Build responsive applications with the team. ".repeat(5) + "…";
+  await withServer({ fetchJobs: async (url) => url.includes("?")
+    ? json({ meta: { hasMore: false }, jobs: [listing(1)] })
+    : json(listing(1, { description: partial })) }, async (_base, post) => {
+      const reply = await post({ resumeText: resume });
+      assert.equal(reply.status, 200);
+      const data = await reply.json();
+      assert.equal(data.results.length, 1);
+      assert.equal(data.explore.length, 0);
+      const item = data.results[0];
+      assert.ok(Number.isFinite(item.analysis.matchScore));
+      assert.equal(item.analysis.partial, true);
+      assert.ok(item.analysis.matchedSkills.includes("React"));
+      assert.ok(item.analysis.missingSkills.includes("Python"));
+      assert.match(item.analysis.explanation, /incomplete source description/);
+      assert.ok(item.job.description.includes("React"));
+    });
+});

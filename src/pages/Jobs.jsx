@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { DocumentInput } from "../components/DocumentInput.jsx";
 import { retryAfterSeconds } from "../retry.js";
-import "./Jobs.css";
 import "../Jobs.css";
 
 const cities = ["Bengaluru", "Hyderabad", "Pune", "Chennai", "Mumbai", "Delhi"];
@@ -24,7 +23,7 @@ export default function Jobs({
   const [filters, setFilters] = useState({
     city: "",
     type: "any",
-    days: "7",
+    days: "30",
     level: "all",
   });
   const [otherCity, setOtherCity] = useState("");
@@ -32,7 +31,6 @@ export default function Jobs({
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [visible, setVisible] = useState(8);
   const [retryAt, setRetryAt] = useState(session.retryAt || 0);
   const [clock, setClock] = useState(Date.now());
   const controller = useRef(null);
@@ -41,7 +39,6 @@ export default function Jobs({
     city: filters.city === "other" ? otherCity.trim() : filters.city,
   };
   const filterKey = JSON.stringify(query);
-  const cacheKey = filterKey;
   const cooldown = Math.max(0, Math.ceil((retryAt - clock) / 1000));
 
   useEffect(() => {
@@ -79,22 +76,15 @@ export default function Jobs({
     clearError();
     if (resumeText.trim()) setResumeOpen(false);
     try {
-      const response = await fetch(
-        resumeText.trim()
-          ? "/api/jobs/match"
-          : `/api/jobs?${new URLSearchParams(query)}`,
-        resumeText.trim()
-          ? {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: request.signal,
-              body: JSON.stringify({
-                resumeText: resumeText.trim(),
-                filters: query,
-              }),
-            }
-          : { signal: request.signal },
-      );
+      const text = resumeText.trim();
+      const url = text ? "/api/jobs/match" : `/api/jobs?${new URLSearchParams(query)}`;
+      const options = { signal: request.signal };
+      if (text) {
+        options.method = "POST";
+        options.headers = { "Content-Type": "application/json" };
+        options.body = JSON.stringify({ resumeText: text, filters: query });
+      }
+      const response = await fetch(url, options);
       const body = await response.json().catch(() => null);
       if (controller.current !== request) return;
       setCooldown(response, body);
@@ -115,11 +105,10 @@ export default function Jobs({
             })),
           };
       setData(next);
-      setVisible(8);
       if (!body.warning && !body.retryAfterSeconds) {
         if (session.responses.size >= 10)
           session.responses.delete(session.responses.keys().next().value);
-        session.responses.set(cacheKey, {
+        session.responses.set(filterKey, {
           data: next,
           expires: Date.now() + 10 * 60000,
         });
@@ -147,9 +136,8 @@ export default function Jobs({
       session.responses.clear();
       session.resumeText = resumeText.trim();
     }
-    const cached = session.responses.get(cacheKey);
+    const cached = session.responses.get(filterKey);
     setData(cached?.expires > Date.now() ? cached.data : null);
-    setVisible(8);
     if (
       reading ||
       !resumeText.trim() ||
@@ -168,6 +156,11 @@ export default function Jobs({
 
   const results = data?.results || [];
   const explore = data?.explore || [];
+  const jobs = [...results, ...explore].sort((a, b) =>
+    (b.analysis?.matchScore ?? -1) - (a.analysis?.matchScore ?? -1) ||
+    (Date.parse(b.job.postedAt) || 0) - (Date.parse(a.job.postedAt) || 0) ||
+    a.job.id.localeCompare(b.job.id),
+  );
   return (
     <section
       className="panel-section smart-jobs"
@@ -369,11 +362,11 @@ export default function Jobs({
       <section className="smart-results" aria-labelledby="smart-recommended">
         <div className="smart-results-heading">
           <h2 id="smart-recommended">
-            Recommended for You <span>{results.length}</span>
+            Jobs <span>{jobs.length}</span>
           </h2>
           <small>Estimated compatibility · highest first</small>
         </div>
-        {!results.length && !busy ? (
+        {!jobs.length && !busy ? (
           <div className="smart-empty">
             <h3>
               {!resumeText.trim()
@@ -388,7 +381,7 @@ export default function Jobs({
           </div>
         ) : null}
         <div className="smart-job-list">
-          {results.slice(0, visible).map((item) => (
+          {jobs.map((item) => (
             <JobCard
               key={item.job.id}
               {...item}
@@ -396,44 +389,7 @@ export default function Jobs({
             />
           ))}
         </div>
-        {results.length > visible ? (
-          <button
-            className="button button-secondary smart-load-more"
-            onClick={() => setVisible(visible + 8)}
-          >
-            Show more matches
-          </button>
-        ) : null}
       </section>
-      {explore.length ? (
-        <section className="smart-results" aria-labelledby="smart-explore">
-          <div className="smart-results-heading">
-            <h2 id="smart-explore">
-              Explore Other Jobs <span>{explore.length}</span>
-            </h2>
-            <small>
-              Browse listings with available source details
-            </small>
-          </div>
-          <div className="smart-job-list">
-            {explore.slice(0, visible).map((item) => (
-              <JobCard
-                key={item.job.id}
-                {...item}
-                resumeSkills={data.profile?.skills || []}
-              />
-            ))}
-          </div>
-          {explore.length > visible ? (
-            <button
-              className="button button-secondary smart-load-more"
-              onClick={() => setVisible(visible + 8)}
-            >
-              Show more jobs
-            </button>
-          ) : null}
-        </section>
-      ) : null}
       {data ? (
         <p className="smart-source-note">
           {data.retrieved} source listings retrieved · {results.length} scored ·{" "}
@@ -508,6 +464,7 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
         <div className="smart-job-copy">
           <h3>{job.title}</h3>
           <p>{job.company}</p>
+          {analysis?.partial ? <small className="smart-skills-note">Estimated score · incomplete description</small> : null}
           <div className="smart-job-meta">
             <span>
               {job.location || "Location not supplied"}
@@ -529,9 +486,9 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
           {score !== null ? (
             <>
               <span className="smart-score-hint">
-                Hover or tap
+                <strong>{score}% match</strong>
                 <br />
-                to view match
+                Hover or tap
               </span>
               <div
                 className="smart-score-ring"
@@ -560,7 +517,7 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
               </div>
             </>
           ) : (
-            <span className="smart-no-score">Not evaluated</span>
+            <span className="smart-no-score">Score unavailable</span>
           )}
         </div>
         <a
@@ -593,14 +550,14 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
           {score !== null ? "Why this match?" : "Why unavailable?"}
         </summary>
         <p>
-          {analysis?.explanation ||
-            reason ||
+          {(score === null ? reason : analysis?.explanation) ||
+            analysis?.explanation ||
             "No sufficient verified requirements were available to calculate a score."}
         </p>
-        {score !== null ? (
+        {analysis?.requiredSkills?.length ? (
           <div className="smart-skill-comparison">
             <SkillList
-              title="Skills this job requires"
+              title={score === null || analysis?.partial ? "Skills identified in available requirements" : "Skills this job requires"}
               skills={analysis.requiredSkills || []}
               empty="Refresh your matches to load the complete required skill list."
             />
@@ -611,12 +568,21 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
               empty="No required technical skills were matched."
             />
             <SkillList
-              title="Skills to build or demonstrate"
+              title={score === null || analysis?.partial ? "Not demonstrated in your resume" : "Skills to build or demonstrate"}
               skills={analysis.missingSkills || []}
               tone="missing"
-              empty="No gaps found among the extracted technical requirements."
+              empty={score === null ? "No gaps found in this partial evidence; the full requirements are not verified." : "No gaps found among the extracted technical requirements."}
             />
           </div>
+        ) : null}
+        {score === null || analysis?.partial ? (
+          <>
+            <p className="smart-skills-note">Partial evidence only. Additional skills or eligibility requirements may be missing from the source text.</p>
+            <details className="smart-calculation">
+              <summary>Available job description</summary>
+              <p style={{ whiteSpace: "pre-wrap" }}>{job.description || "The provider did not supply readable job-description text. Open the source listing for requirements."}</p>
+            </details>
+          </>
         ) : null}
         {resumeSkills.length ? (
           <SkillList
@@ -648,8 +614,7 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
           </details>
         ) : null}
         <p>
-          Estimated resume compatibility, not hiring probability. Confirm
-          requirements on the source.
+          {score === null ? "No match percentage assigned. Check the source for complete requirements." : "Estimated resume compatibility, not hiring probability. Confirm requirements on the source."}
         </p>
       </details>
     </article>
