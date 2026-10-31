@@ -38,9 +38,14 @@ export default function JobsResume() {
 
     setReading(true);
     try {
-      const text = isDocx
-        ? await (await import("../extractDocxText.js")).extractDocxText(file)
-        : await (await import("../extractPdfText.js")).extractPdfText(file);
+      let text;
+      if (isDocx) {
+        const { extractDocxText } = await import("../extractDocxText.js");
+        text = await extractDocxText(file);
+      } else {
+        const { extractPdfText } = await import("../extractPdfText.js");
+        text = await extractPdfText(file);
+      }
       if (version !== uploads.current) return;
       if (!text.trim()) throw new Error("NO_TEXT");
       if (text.length > 15000) throw new Error("TOO_LONG");
@@ -69,18 +74,18 @@ export default function JobsResume() {
         <a className="jobs-logo" href="/jobs">Resume Mate</a>
         <span>Live Jobs</span>
       </header>
-    <main className="jobs-matcher">
-      <Jobs
-        session={session.current}
-        resumeText={resumeText}
-        fileName={fileName}
-        reading={reading}
-        onFileChange={uploadFile}
-        onTextChange={editText}
-        errorMessage={error}
-        clearError={() => setError("")}
-      />
-    </main>
+      <main className="jobs-matcher">
+        <Jobs
+          session={session.current}
+          resumeText={resumeText}
+          fileName={fileName}
+          reading={reading}
+          onFileChange={uploadFile}
+          onTextChange={editText}
+          errorMessage={error}
+          clearError={() => setError("")}
+        />
+      </main>
       <footer className="jobs-footer">
         <p>Resume Mate</p>
         <p>Live Indian technology jobs · Dev Global Jobs</p>

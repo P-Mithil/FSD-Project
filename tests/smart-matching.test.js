@@ -198,3 +198,15 @@ test("stable scores sort descending with recency ties and null below genuine zer
     ["3", "2", "1", "0"],
   );
 });
+
+
+test("partial scoring is explicit, weighted and still refuses descriptions without requirements", () => {
+  const partial = { ...job, fullDescription: false };
+  const profile = getProfile(resume);
+  const estimated = getScore(partial, profile, "", { allowPartial: true });
+  assert.equal(getScore(partial, profile).matchScore, null);
+  assert.equal(estimated.matchScore, getScore(job, profile).matchScore);
+  assert.equal(estimated.partial, true);
+  assert.equal(getScore({ ...partial, description: "React Developer" }, profile, "", { allowPartial: true }).matchScore, null);
+  assert.equal(getScore({ ...partial, description: "We build great products. ".repeat(20) }, profile, "", { allowPartial: true }).matchScore, null);
+});

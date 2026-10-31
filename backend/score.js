@@ -320,7 +320,7 @@ export function getRequirements(job) {
   };
 }
 
-export function getScore(job, profile, location = "") {
+export function getScore(job, profile, location = "", options = {}) {
   const requirements = getRequirements(job);
   const matched = requirements.skillGroups.filter((group) =>
     group.some((skill) => profile.skills.includes(skill)),
@@ -419,7 +419,7 @@ export function getScore(job, profile, location = "") {
   }));
   // A title or a truncated company introduction alone cannot support a percentage.
   const scorable =
-    job.fullDescription &&
+    (job.fullDescription || options.allowPartial === true) &&
     job.description.length >= 180 &&
     requirements.skillGroups.length > 0 &&
     profile.skills.length > 0;
@@ -430,6 +430,7 @@ export function getScore(job, profile, location = "") {
     : null;
   return {
     matchScore,
+    partial: scorable && !job.fullDescription,
     ineligible: ineligible || degreeIneligible,
     breakdown,
     requiredSkills: requirements.skillGroups.map((group) => group.join(" or ")),
@@ -439,7 +440,7 @@ export function getScore(job, profile, location = "") {
     missingSkills: missing.map((group) => group.join(" or ")),
     explanation: !scorable
       ? "The available description or resume has insufficient identifiable skill evidence."
-      : `${matched.length} of ${requirements.skillGroups.length} required skill groups demonstrated. ${profile.experienceYears === null && requirements.minimumExperience !== null ? "Work experience needs confirmation." : "Review source eligibility before applying."}`,
+      : `${!job.fullDescription ? "Estimated from an incomplete source description. " : ""}${matched.length} of ${requirements.skillGroups.length} required skill groups demonstrated. ${profile.experienceYears === null && requirements.minimumExperience !== null ? "Work experience needs confirmation." : "Review source eligibility before applying."}`,
   };
 }
 export function sortJobs(results) {

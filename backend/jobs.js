@@ -135,14 +135,39 @@ export function createJobHandlers(options = {}) {
       const explore = [];
       let excluded = 0;
       let warning = feed.warning;
+
+      function addJob(job, reason = "", partial = false) {
+        const analysis = getScore(
+          partial ? { ...job, fullDescription: false } : job,
+          profile.data,
+          filters.city,
+          { allowPartial: true },
+        );
+        if (analysis.ineligible) {
+          excluded++;
+          return;
+        }
+        if (Number.isFinite(analysis.matchScore)) {
+          results.push({ job, analysis });
+          return;
+        }
+        if (!reason) {
+          if (!job.fullDescription) {
+            reason = "The source supplied an incomplete or truncated description. Skills below reflect only the available text; no percentage was calculated.";
+          } else if (job.description.length < 180) {
+            reason = "The job description is too short for a reliable percentage. Skills below reflect only the available text.";
+          } else {
+            reason = "No explicit technical requirements could be verified in the supplied description; no percentage was calculated.";
+          }
+        }
+        explore.push({ job, reason, analysis: { ...analysis, breakdown: null } });
+      }
+
       const deadline = now() + 70000;
       for (let index = 0; index < candidates.length; index++) {
         let job = candidates[index].job;
         if (index >= MAX_DETAILS || now() >= deadline) {
-          explore.push({
-            job,
-            reason: "Full description not evaluated in this bounded batch.",
-          });
+          addJob(job, "Full description not evaluated in this batch. Any skills below come only from the available source text.", true);
           continue;
         }
         try {
@@ -153,24 +178,14 @@ export function createJobHandlers(options = {}) {
             continue;
           }
           warning = error.message;
-          explore.push({
-            job,
-            reason: "Full description unavailable; no score assigned.",
-          });
+          addJob(job, "Full description unavailable; no score assigned. Any skills below come only from the available source text.", true);
           continue;
         }
         if (!filterJobs([job], filters, now()).length) {
           excluded++;
           continue;
         }
-        const analysis = getScore(job, profile.data, filters.city);
-        if (analysis.ineligible) {
-          excluded++;
-          continue;
-        }
-        if (analysis.matchScore === null)
-          explore.push({ job, reason: analysis.explanation });
-        else results.push({ job, analysis });
+        addJob(job);
       }
       const data = {
         profile: profile.data,
