@@ -410,15 +410,16 @@ export function getScore(job, profile, location = "", options = {}) {
   const breakdown = factors.map((row) => ({
     ...row,
     weight: JOB_WEIGHTS[row.id],
-    effectiveWeight: row.applicable
+    effectiveWeight: row.applicable && totalWeight > 0
       ? (JOB_WEIGHTS[row.id] / totalWeight) * 100
       : 0,
-    contribution: row.applicable
+    contribution: row.applicable && totalWeight > 0
       ? ((row.credit * JOB_WEIGHTS[row.id]) / totalWeight) * 100
       : 0,
   }));
   // A title or a truncated company introduction alone cannot support a percentage.
   const scorable =
+    totalWeight > 0 &&
     (job.fullDescription || options.allowPartial === true) &&
     job.description.length >= 180 &&
     requirements.skillGroups.length > 0 &&

@@ -43,3 +43,23 @@ test("filters compose without modifying the source feed and can return an empty 
   assert.deepEqual(filter(jobs, { city: "Mumbai" }), []);
   assert.deepEqual(jobs, snapshot);
 });
+
+
+test("date filtering uses the current clock and rejects future postings even with no date window", () => {
+  const time = Date.now();
+  const rows = [job({ title: "Current", postedAt: new Date(time - 86400000).toISOString() }),
+    job({ title: "Future", postedAt: new Date(time + 86400000).toISOString() })];
+  assert.deepEqual(filterJobs(rows, { days: 0 }).map(row => row.title), ["Current"]);
+  assert.deepEqual(filterJobs(rows, { days: 7 }).map(row => row.title), ["Current"]);
+});
+
+test("posting-window boundaries keep clock-skew tolerance but reject invalid dated rows", () => {
+  const minute = 60000;
+  const rows = [job({ title: "Boundary", postedAt: new Date(now - 7 * 86400000).toISOString() }),
+    job({ title: "Older", postedAt: new Date(now - 7 * 86400000 - 1).toISOString() }),
+    job({ title: "Clock skew", postedAt: new Date(now + 5 * minute).toISOString() }),
+    job({ title: "Future", postedAt: new Date(now + 5 * minute + 1).toISOString() }),
+    job({ title: "Invalid", postedAt: "not a date" })];
+  assert.deepEqual(filterJobs(rows, { days: 7 }, now).map(row => row.title), ["Boundary", "Clock skew"]);
+  assert.deepEqual(filterJobs(rows, { days: 0 }, now).map(row => row.title), ["Boundary", "Older", "Clock skew", "Invalid"]);
+});

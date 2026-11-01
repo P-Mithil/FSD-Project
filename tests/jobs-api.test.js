@@ -210,3 +210,38 @@ test("truncated descriptions produce labeled estimates from explicit available r
       assert.ok(item.job.description.includes("React"));
     });
 });
+
+
+test("failed full-description fetches retain an explicit partial estimate and failure explanation", async () => {
+  await withServer({ fetchJobs: async (url) => url.includes("?")
+    ? json({ meta: { hasMore: false }, jobs: [listing(1, { description })] })
+    : json({}, 503) }, async (_base, post) => {
+      const data = await (await post({ resumeText: resume })).json();
+      assert.equal(data.results.length, 1);
+      assert.equal(data.results[0].analysis.partial, true);
+      assert.ok(Number.isFinite(data.results[0].analysis.matchScore));
+      assert.match(data.results[0].analysis.explanation, /could not be fetched/);
+      assert.match(data.results[0].analysis.explanation, /incomplete source description/);
+      assert.ok(!data.results[0].analysis.explanation.includes("no score assigned"));
+      assert.ok(data.warning);
+    });
+});
+
+test("batch-limited descriptions cannot appear as fully verified matches", async () => {
+  let details = 0;
+  const rows = Array.from({ length: 21 }, (_, idx) => listing(idx + 1, { description }));
+  await withServer({ fetchJobs: async (url) => {
+    if (url.includes("?")) return json({ meta: { hasMore: false }, jobs: rows });
+    details++;
+    return json(rows.find(row => String(row.id) === url.split("/").at(-1)));
+  } }, async (_base, post) => {
+    const data = await (await post({ resumeText: resume })).json();
+    assert.equal(details, 20);
+    assert.equal(data.results.length, 21);
+    const verified = data.results.filter(item => !item.analysis.partial);
+    const partial = data.results.filter(item => item.analysis.partial);
+    assert.equal(verified.length, 20);
+    assert.equal(partial.length, 1);
+    assert.match(partial[0].analysis.explanation, /not evaluated in this batch/);
+  });
+});
