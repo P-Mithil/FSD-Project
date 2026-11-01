@@ -88,7 +88,6 @@ export default function JobsResume() {
       </main>
       <footer className="jobs-footer">
         <p>Resume Mate</p>
-        <p>Live Indian technology jobs · Dev Global Jobs</p>
       </footer>
     </div>
   );

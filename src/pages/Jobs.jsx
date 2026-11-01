@@ -303,19 +303,6 @@ export default function Jobs({
               : "Browse Indian jobs ↗"}
         </button>
       </form>
-      <p className="smart-source-note">
-        <a
-          href="https://devglobaljobs.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by Dev Global Jobs
-        </a>
-      </p>
-      <p className="smart-privacy">
-        Documents are read in your browser. Matching runs in our Express server
-        without sending your resume to the jobs provider or an AI service.
-      </p>
       {errorMessage || error ? (
         <p className="error-box" role="alert">
           {errorMessage || error}
@@ -364,7 +351,6 @@ export default function Jobs({
           <h2 id="smart-recommended">
             Jobs <span>{jobs.length}</span>
           </h2>
-          <small>Estimated compatibility · highest first</small>
         </div>
         {!jobs.length && !busy ? (
           <div className="smart-empty">
@@ -390,14 +376,6 @@ export default function Jobs({
           ))}
         </div>
       </section>
-      {data ? (
-        <p className="smart-source-note">
-          {data.retrieved} source listings retrieved · {results.length} scored ·{" "}
-          {data.excluded || 0} closed or explicitly ineligible listings
-          excluded. {data.notice} Apply links open the provider’s required
-          original job page.
-        </p>
-      ) : null}
     </section>
   );
 }
