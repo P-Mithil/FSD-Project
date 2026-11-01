@@ -148,6 +148,9 @@ export function createJobHandlers(options = {}) {
           return;
         }
         if (Number.isFinite(analysis.matchScore)) {
+          if (analysis.partial && reason) {
+            analysis.explanation = `${reason} ${analysis.explanation}`;
+          }
           results.push({ job, analysis });
           return;
         }
@@ -167,7 +170,7 @@ export function createJobHandlers(options = {}) {
       for (let index = 0; index < candidates.length; index++) {
         let job = candidates[index].job;
         if (index >= MAX_DETAILS || now() >= deadline) {
-          addJob(job, "Full description not evaluated in this batch. Any skills below come only from the available source text.", true);
+          addJob(job, "Full description not evaluated in this batch. Only the available source text was compared.", true);
           continue;
         }
         try {
@@ -178,7 +181,7 @@ export function createJobHandlers(options = {}) {
             continue;
           }
           warning = error.message;
-          addJob(job, "Full description unavailable; no score assigned. Any skills below come only from the available source text.", true);
+          addJob(job, "Full description could not be fetched. Only the available source text was compared.", true);
           continue;
         }
         if (!filterJobs([job], filters, now()).length) {

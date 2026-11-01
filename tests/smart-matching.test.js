@@ -210,3 +210,19 @@ test("partial scoring is explicit, weighted and still refuses descriptions witho
   assert.equal(getScore({ ...partial, description: "React Developer" }, profile, "", { allowPartial: true }).matchScore, null);
   assert.equal(getScore({ ...partial, description: "We build great products. ".repeat(20) }, profile, "", { allowPartial: true }).matchScore, null);
 });
+
+
+test("no applicable scoring factors produce finite zero breakdown values and no score", () => {
+  const unknownJob = { title: "Unspecified opportunity", description: "Contact the company for further information. ".repeat(6), location: "", fullDescription: true };
+  for (const profile of [getProfile("General applicant"), getProfile(resume)]) {
+    const result = getScore(unknownJob, profile, "", { allowPartial: true });
+    assert.equal(result.matchScore, null);
+    for (const row of result.breakdown) {
+      assert.equal(row.applicable, false);
+      assert.equal(row.effectiveWeight, 0);
+      assert.equal(row.contribution, 0);
+      assert.ok(Number.isFinite(row.credit));
+    }
+    assert.deepEqual(JSON.parse(JSON.stringify(result.breakdown)), result.breakdown);
+  }
+});

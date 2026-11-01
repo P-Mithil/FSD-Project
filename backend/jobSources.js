@@ -154,6 +154,8 @@ export function normalizeJobs(rows, now = Date.now()) {
 export function filterJobs(jobs, filters, now = Date.now()) {
   return jobs.filter((job) => {
     if (job.closingDate && Date.parse(job.closingDate) <= now) return false;
+    const postedAt = Date.parse(job.postedAt);
+    if (postedAt > now + 5 * MINUTE) return false;
     if (filters.city === "remote" && !job.remote) return false;
     if (
       filters.city &&
@@ -178,8 +180,8 @@ export function filterJobs(jobs, filters, now = Date.now()) {
       return false;
     if (
       filters.days &&
-      (!job.postedAt ||
-        Date.parse(job.postedAt) < now - filters.days * 86400000)
+      (!Number.isFinite(postedAt) ||
+        postedAt < now - filters.days * 86400000)
     )
       return false;
     return true;

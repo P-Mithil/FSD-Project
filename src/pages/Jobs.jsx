@@ -406,6 +406,7 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
   const score = Number.isFinite(analysis?.matchScore)
     ? analysis.matchScore
     : null;
+  const incomplete = score === null || Boolean(analysis?.partial);
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -557,7 +558,7 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
         {analysis?.requiredSkills?.length ? (
           <div className="smart-skill-comparison">
             <SkillList
-              title={score === null || analysis?.partial ? "Skills identified in available requirements" : "Skills this job requires"}
+              title={incomplete ? "Skills identified in available requirements" : "Skills this job requires"}
               skills={analysis.requiredSkills || []}
               empty="Refresh your matches to load the complete required skill list."
             />
@@ -568,14 +569,14 @@ function JobCard({ job, analysis, reason, resumeSkills = [] }) {
               empty="No required technical skills were matched."
             />
             <SkillList
-              title={score === null || analysis?.partial ? "Not demonstrated in your resume" : "Skills to build or demonstrate"}
+              title={incomplete ? "Not demonstrated in your resume" : "Skills to build or demonstrate"}
               skills={analysis.missingSkills || []}
               tone="missing"
-              empty={score === null ? "No gaps found in this partial evidence; the full requirements are not verified." : "No gaps found among the extracted technical requirements."}
+              empty={incomplete ? "No gaps found in this partial evidence; the full requirements are not verified." : "No gaps found among the extracted technical requirements."}
             />
           </div>
         ) : null}
-        {score === null || analysis?.partial ? (
+        {incomplete ? (
           <>
             <p className="smart-skills-note">Partial evidence only. Additional skills or eligibility requirements may be missing from the source text.</p>
             <details className="smart-calculation">
