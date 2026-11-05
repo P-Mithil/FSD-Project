@@ -3,12 +3,16 @@ import { existsSync } from "node:fs";
 import { loadEnvFile } from "node:process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import analyze from "../api/analyze.js";
+import analyze from "./analyze.js";
 import { createJobHandlers } from "./jobs.js";
 
 export function createApp(options) {
   const app = express();
   app.disable("x-powered-by");
+  app.use((_req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
   app.use(express.json({ limit: "128kb" }));
   const jobs = createJobHandlers(options);
   app.get("/api/jobs", jobs.getJobs);

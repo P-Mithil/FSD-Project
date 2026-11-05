@@ -6,6 +6,7 @@ dist/
 *.log
 coverage/
 .vite/
+.vercel/
 *.tmp
 *.bak
 .DS_Store

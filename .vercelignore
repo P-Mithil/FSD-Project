@@ -1,0 +1,10 @@
+.env
+.env.*
+backend/.env
+backend/.env.*
+node_modules
+dist
+tests
+*.log
+*.tmp
+*.bak

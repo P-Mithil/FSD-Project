@@ -48,7 +48,7 @@ npm run preview
 | `GET /api/jobs` | Fetches Dev Global Jobs listings and applies city, employment, date, remote and fresher filters |
 | `POST /api/jobs/match` | Receives `{ resumeText, filters }`, compares source requirements with the resume and returns ranked results |
 
-`api/analyze.js` contains the original Groq prompt, structured-output request and response handling. `src/matching.js` validates exact source evidence and applies the original fixed scoring rules. `reviewAnalysis.js` checks the response and quoted evidence before React renders it.
+`backend/analyze.js` contains the original Groq prompt, structured-output request and response handling. `src/matching.js` validates exact source evidence and applies the original fixed scoring rules. `reviewAnalysis.js` checks the response and quoted evidence before React renders it.
 
 Analysis weights are required qualifications 45%, preferred qualifications 15%, projects 20%, experience 15% and resume evidence 5%. A criterion earns 1 for matched, 0.5 for partial and 0 for missing. Unsupported categories are excluded and remaining weights are redistributed. The total is rounded once. For the fictional sample, `round(60*.45 + 25*.15 + 100*.20 + 0*.15 + 100*.05) = 56`.
 
@@ -57,6 +57,16 @@ Jobs use the separate original `backend/score.js` rules: Skills 40%, Role 25%, E
 `backend/jobSources.js` normalizes Dev Global Jobs data and preserves original application URLs. `backend/jobs.js` caches profiles/results and bounds source/detail requests. Scored jobs rank highest first; unavailable scores are never zero. Partial descriptions have an explicit estimate label. Hover, keyboard focus and mobile expansion reveal scores and skill evidence. Future-dated, expired and ineligible listings are excluded using the system clock.
 
 ## Safety and verification
+
+### Vercel deployment
+
+Import `P-Mithil/FSD-Project` with `main` as the production branch. The root `vercel.json` selects Vite, `npm run build` and `dist`. API routing takes priority over static files and the SPA fallback, so `/analyze` and `/jobs` can be refreshed directly.
+
+`api/index.js` exports the existing Express app without opening a listening port. The Groq handler lives in `backend/analyze.js` so it cannot bypass Express validation as a separate Function. Set `GROQ_API_KEY` as a Secret in both Preview and Production; never use a `VITE_` prefix. The Function allows 120 seconds; upstream fetches retain their shorter timeouts and bounded requests.
+
+Caches and server cooldowns are best-effort per warm instance. Cold starts or parallel instances may fetch again; no score or session requires those caches to survive. Browser session caching and cooldowns remain active, and each instance respects provider `Retry-After` responses without automatic retry loops. There is no shared global quota across instances. API responses use `Cache-Control: no-store` to keep resume results out of public CDN caches.
+
+Verify a Preview deployment before production, including synthetic analysis and live jobs. Local tests alone do not prove that cloud provider access or environment variables work.
 
 Missing keys, invalid documents, malformed AI output, timeouts and provider errors produce readable messages. Rate limits respect `Retry-After`; there is no automatic retry loop. Groq allows at most one correction attempt for invalid structured output. Previous results are preserved when requests fail. Keys and complete documents are not logged.
 
