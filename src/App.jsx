@@ -6,6 +6,7 @@ import sample from "./sampleAnalysis.json";
 import { isAnalysisResult } from "./reviewAnalysis.js";
 import { retryAfterSeconds } from "./retry.js";
 import Navbar from "./components/Navbar.jsx";
+import JobsResume from "./components/JobsResume.jsx";
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -16,6 +17,7 @@ export default function App() {
   const [error, setError] = useState("");
   const request = useRef(0);
   const retryAt = useRef(0);
+  const jobsSession = useRef({ responses: new Map(), retryAt: 0 });
   useEffect(() => {
     function back() { setPath(window.location.pathname); }
     window.addEventListener("popstate", back);
@@ -33,7 +35,7 @@ export default function App() {
     const link = event.target.closest?.("a[href]");
     if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;
     const url = new URL(link.href);
-    if (url.origin !== window.location.origin || !["/", "/analyze"].includes(url.pathname)) return;
+    if (url.origin !== window.location.origin || !["/", "/analyze", "/jobs"].includes(url.pathname)) return;
     if (url.pathname === path && url.hash) return;
     event.preventDefault();
     window.history.pushState({}, "", url.pathname + url.hash);
@@ -111,6 +113,7 @@ export default function App() {
     <div onClick={navigate}>
       <Navbar path={path} />
       {path === "/" ? <Home /> : null}
+      {path === "/jobs" ? <JobsResume resumeText={text.resume} onTextChange={updateText} session={jobsSession.current} /> : null}
       {path === "/analyze" ? <>
         <Upload
           text={text}
@@ -128,7 +131,7 @@ export default function App() {
           jobDescription={showSample ? sample.jobDescription : text.job}
         />
       </> : null}
-      {!["/", "/analyze"].includes(path) ? <main>
+      {!["/", "/analyze", "/jobs"].includes(path) ? <main>
       <h1>Page not found</h1>
       <a href="/analyze">Open resume upload</a>
       </main> : null}

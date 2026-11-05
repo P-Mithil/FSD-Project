@@ -26,7 +26,7 @@ export default function Navbar({ path }) {
         <a href="/" aria-current={path === "/" ? "page" : undefined}>Home</a>
         <a href="/analyze" aria-current={path === "/analyze" ? "page" : undefined}>Analyze</a>
         <a href="/#about">About</a>
-        <span aria-disabled="true" title="Live Jobs will be available after its feature is integrated.">Find Jobs</span>
+        <a href="/jobs" aria-current={path === "/jobs" ? "page" : undefined}>Find Jobs</a>
       </nav>
     </header>
   );

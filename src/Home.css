@@ -465,10 +465,7 @@
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: 88px; }
-.site-nav .nav-links span { padding: 8px 16px; color: #a3a3a3; }
 .site-nav a:focus-visible, .site-nav button:focus-visible { outline: 2px solid #ff9aa5; outline-offset: 3px; }
-.home-page [aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
-.home-page .button[aria-disabled="true"]:hover { transform: none; background: var(--accent); }
 
 .home-page .scroll-preview {
   position: relative;

@@ -4,3 +4,9 @@ dist/
 .env.*
 !.env.example
 *.log
+coverage/
+.vite/
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

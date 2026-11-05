@@ -107,9 +107,9 @@ function FeatureCards() {
           Upload your resume and discover real job opportunities ranked by how
           well they match your skills.
         </p>
-        <span className="button button-accent" aria-disabled="true" title="Live Jobs will be available after its feature is integrated.">
+        <a className="button button-accent" href="/jobs">
           Find Matching Jobs
-        </span>
+        </a>
       </article>
     </section>
   );
@@ -175,9 +175,9 @@ function About() {
               source.
             </li>
           </ul>
-          <span className="about-link" aria-disabled="true" title="Live Jobs will be available after its feature is integrated.">
+          <a className="about-link" href="/jobs">
             Explore job opportunities ↗
-          </span>
+          </a>
         </article>
       </div>
       <dl className="about-principles">

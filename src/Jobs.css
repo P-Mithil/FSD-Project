@@ -1,0 +1,757 @@
+.jobs-page {
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  padding-top: 85px;
+}
+
+.jobs-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 28px 5vw;
+  border-top: 1px solid #ffffff29;
+  font-size: 0.8rem;
+}
+
+.jobs-footer p { margin: 0; color: #a3a3a3; }
+
+.smart-jobs {
+  --bg: #050505;
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
+  --line: rgba(255, 255, 255, 0.16);
+  --card: #0c0c0c;
+  --accent: #e53e50;
+  --accent-hover: #f05263;
+  --accent-text: #ff9aa5;
+  --accent-soft: #e53e5012;
+  --accent-border: #e53e5045;
+  color-scheme: dark;
+  max-width: none;
+  margin: 36px auto 0;
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  line-height: normal;
+  color: var(--text);
+}
+
+.smart-jobs h1 { color: var(--text); }
+.smart-jobs h1, .smart-jobs h2, .smart-jobs h3, .smart-jobs p { margin-top: 0; }
+.smart-jobs h1, .smart-jobs h2, .smart-jobs h3 { text-wrap: balance; }
+.smart-jobs p { line-height: 1.6; }
+.smart-jobs h2 { margin-bottom: 12px; font-size: clamp(1.8rem, 3vw, 2.4rem); letter-spacing: -0.03em; }
+.smart-jobs h3 { margin-bottom: 8px; font-size: 1.15rem; }
+.smart-jobs a:focus-visible, .smart-jobs button:focus-visible, .smart-jobs select:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.smart-jobs .error-box { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+
+.smart-jobs .eyebrow {
+  margin-bottom: 10px;
+  color: var(--accent-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.smart-jobs .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 22px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.smart-jobs .button:hover {
+  transform: translateY(-2px);
+  background: var(--accent-hover);
+}
+
+.smart-jobs .button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-jobs .button, .smart-jobs .button:hover { transition: none; transform: none; }
+}
+
+.jobs-page .smart-jobs { width: min(1120px, calc(100% - 8vw)); }
+
+.jobs-matcher { max-width: none; margin: 0; padding: 0; }
+
+.smart-jobs .card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--card);
+}
+
+.smart-jobs .card-help {
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.smart-jobs .file-status {
+  margin-bottom: 0;
+}
+
+.smart-jobs textarea:focus-visible,
+.smart-jobs input:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+
+.smart-jobs textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #000000;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.smart-jobs .document-input {
+  min-width: 0;
+}
+
+.smart-jobs .upload-area {
+  padding: 20px;
+  margin: 18px 0;
+  border: 1px dashed #ffffff38;
+  border-radius: 16px;
+  background: #ffffff03;
+}
+
+.smart-jobs .upload-area .card-help {
+  font-size: 0.85rem;
+}
+
+.smart-jobs .upload-area input {
+  display: block;
+  max-width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #b9b9b9;
+}
+
+.smart-jobs .upload-area input::file-selector-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  margin-right: 10px;
+  background: white;
+  color: black;
+  cursor: pointer;
+  font: inherit;
+}
+
+.smart-jobs .upload-area .file-status {
+  margin-top: 12px;
+  color: #aaa;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.smart-jobs .text-count {
+  margin: 8px 0 0;
+  color: #aaa;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.smart-jobs .over-limit {
+  color: #ffa6ad;
+}
+
+.smart-jobs .upload-label, .smart-jobs .text-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
+
+/* Black/red brand with green, amber and muted red compatibility indicators. */
+.smart-jobs {
+  width: min(1160px, calc(100% - 8vw));
+  padding: 20px 0 40px;
+}
+.smart-jobs-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.smart-jobs-heading h1 {
+  font-size: clamp(2.1rem, 4.5vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+  margin: 0 0 14px;
+}
+.smart-jobs-heading p:last-child {
+  color: var(--muted);
+  margin: 0;
+}
+.smart-india-pill {
+  padding: 10px 16px;
+  border-radius: 99px;
+  border: 1px solid var(--accent-border);
+  color: var(--accent-text);
+  white-space: nowrap;
+  background: var(--accent-soft);
+}
+.accent-text {
+  color: var(--accent-text);
+}
+.resume-drawer {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  margin-bottom: 18px;
+}
+.resume-drawer > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 22px;
+  cursor: pointer;
+}
+.resume-drawer summary small {
+  color: var(--muted);
+  display: block;
+  margin-top: 5px;
+  font-size: 0.8rem;
+}
+.resume-drawer summary > span:last-child {
+  font-size: 0.85rem;
+}
+.resume-drawer > .document-input {
+  border: 0;
+  border-radius: 0 0 16px 16px;
+}
+.resume-drawer textarea {
+  min-height: 150px;
+  max-height: 240px;
+}
+.smart-job-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.smart-job-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 150px;
+  color: #bcbcbc;
+  font-size: 0.78rem;
+}
+.smart-job-filters input,
+.smart-job-filters select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: #070707;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 42px;
+  padding: 9px 10px;
+}
+.smart-job-filters .button {
+  min-height: 42px;
+  font-size: 0.85rem;
+  padding: 10px 18px;
+}
+.smart-source-note,
+.smart-privacy {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.smart-source-note a {
+  color: var(--accent-text);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+.smart-privacy {
+  color: #888;
+  margin-bottom: 24px;
+}
+.smart-profile {
+  display: flex;
+  gap: 14px 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 24px 0;
+  padding: 18px 20px;
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+.smart-profile .eyebrow {
+  display: block;
+  font-size: 0.65rem;
+  margin-bottom: 5px;
+}
+.smart-profile strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.smart-profile small {
+  color: var(--muted);
+  flex-basis: 100%;
+  font-size: 0.75rem;
+}
+.smart-profile-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.smart-profile-skills span {
+  border: 1px solid #ffffff18;
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #c6c6c6;
+  font-size: 0.72rem;
+}
+.smart-results {
+  margin-top: 32px;
+}
+.smart-results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.smart-results-heading h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.smart-results-heading h2 span {
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  margin-left: 7px;
+}
+.smart-results-heading small {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.smart-job-list {
+  display: grid;
+  gap: 12px;
+}
+.smart-job {
+  --score-color: #ce7b83;
+  position: relative;
+  padding: 18px 20px 10px;
+  border: 1px solid #ffffff1a;
+  border-radius: 14px;
+  background: linear-gradient(125deg, #121010, #0b0b0b 65%);
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+  min-width: 0;
+}
+.smart-job.score-strong {
+  --score-color: #8de0af;
+}
+.smart-job.score-moderate {
+  --score-color: #e5bf70;
+}
+.smart-job:hover,
+.smart-job.score-open {
+  border-color: var(--accent-border);
+  box-shadow: 0 6px 24px #e53e500a;
+  transform: translateY(-2px);
+}
+.smart-job:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+.smart-job-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 80px;
+}
+.smart-company-mark {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+.smart-company-mark img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.smart-job-copy {
+  flex: 1;
+  min-width: 0;
+}
+.smart-job h3 {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin: 0 0 4px;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.smart-job-copy > p {
+  font-size: 0.82rem;
+  color: #bcbcbc;
+  margin: 0 0 7px;
+  line-height: 1.4;
+}
+.smart-job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: #888;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+.smart-score-slot {
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.smart-score-hint {
+  font-size: 0.65rem;
+  line-height: 1.5;
+  text-align: center;
+  color: #888;
+  transition: opacity 200ms;
+}
+.score-open .smart-score-hint {
+  opacity: 0;
+}
+.smart-score-ring {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--score-color);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.93);
+  transition:
+    opacity 220ms ease,
+    visibility 220ms,
+    transform 220ms ease;
+}
+.score-open .smart-score-ring {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+.smart-score-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  fill: none;
+  stroke-width: 6;
+}
+.smart-ring-track {
+  stroke: #ffffff12;
+}
+.smart-ring-progress {
+  stroke: var(--score-color);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  transition: stroke-dashoffset 700ms ease;
+}
+.smart-score-ring strong {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+.smart-score-ring small {
+  font-size: 0.7rem;
+}
+.smart-no-score {
+  color: #999;
+  font-size: 0.68rem;
+  text-align: center;
+  line-height: 1.5;
+}
+.smart-apply {
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.smart-apply:hover {
+  background: var(--accent-hover);
+}
+.smart-score-tooltip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.72rem;
+  color: #aaa;
+  /* Reserve the tooltip's space so hovering cannot move the expand control. */
+  min-height: 20px;
+  margin: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 220ms ease,
+    visibility 220ms;
+}
+.smart-score-tooltip strong {
+  color: var(--score-color);
+  font-weight: 500;
+}
+.score-open .smart-score-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+.smart-score-details {
+  border-top: 1px solid #ffffff0c;
+  margin-top: 10px;
+}
+.smart-score-details summary {
+  font-size: 0.7rem;
+  color: #888;
+  cursor: pointer;
+  padding-top: 9px;
+}
+.smart-score-details p,
+.smart-score-details li {
+  font-size: 0.8rem;
+  color: #aaa;
+  line-height: 1.65;
+}
+.smart-score-details ul {
+  padding-left: 18px;
+}
+.smart-skill-comparison {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.smart-skill-group {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff03;
+  min-width: 0;
+}
+.smart-skill-group h4 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.smart-skill-group h4 span {
+  color: var(--muted);
+  margin-left: 5px;
+  font-size: 0.72rem;
+}
+.smart-score-details .smart-skill-group ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+.smart-score-details .smart-skill-group li {
+  margin: 0;
+  padding: 4px 8px;
+  background: #ffffff08;
+  border: 1px solid #ffffff14;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #ccc;
+  overflow-wrap: anywhere;
+}
+.smart-score-details .smart-skill-group p {
+  margin: 0;
+  font-size: 0.78rem;
+}
+.skill-tone-matched {
+  border-color: #8de0af30;
+}
+.skill-tone-missing {
+  border-color: #ce7b8340;
+}
+.smart-score-details .skill-tone-matched li {
+  color: #8de0af;
+  background: #8de0af0a;
+  border-color: #8de0af25;
+}
+.smart-score-details .skill-tone-missing li {
+  color: #eaa0a8;
+  background: #ce7b830a;
+  border-color: #ce7b8325;
+}
+.smart-skills-note {
+  margin: 12px 0;
+}
+.smart-calculation {
+  margin: 16px 0;
+  padding-top: 4px;
+}
+@media (max-width: 700px) {
+  .smart-skill-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.smart-score-details li {
+  margin: 8px 0;
+}
+.smart-empty {
+  padding: 32px 24px;
+  border: 1px dashed #ffffff20;
+  border-radius: 16px;
+  text-align: center;
+}
+.smart-empty h3 {
+  font-size: 1.1rem;
+}
+.smart-empty p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.smart-loading {
+  padding: 16px;
+  font-size: 0.9rem;
+  color: var(--accent-text);
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+.match-warning {
+  color: #c4b98e;
+  font-size: 0.85rem;
+  border-left: 2px solid #897749;
+  padding: 10px 14px;
+  background: #8977490a;
+}
+.match-cooldown {
+  padding: 16px 18px;
+  border: 1px solid #baa26b50;
+  background: #baa26b0a;
+  border-radius: 12px;
+  margin: 20px 0;
+  color: #d2c29e;
+  font-size: 0.85rem;
+}
+@media (max-width: 650px) {
+  .smart-jobs-heading {
+    align-items: start;
+  }
+  .smart-india-pill {
+    display: none;
+  }
+  .smart-job {
+    padding: 14px 14px 10px;
+  }
+  .smart-job-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .smart-company-mark {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+  .smart-job-copy {
+    flex-basis: calc(100% - 48px);
+  }
+  .smart-job h3 {
+    font-size: 0.95rem;
+  }
+  .smart-score-slot {
+    width: 70px;
+    height: 70px;
+    flex-basis: 70px;
+    margin-left: 46px;
+  }
+  .smart-score-hint {
+    display: none;
+  }
+  .smart-score-ring {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .smart-ring-progress {
+    stroke-dashoffset: var(--match-offset) !important;
+  }
+  .smart-apply {
+    margin-left: auto;
+  }
+  .smart-no-score {
+    text-align: left;
+  }
+  .smart-job-filters {
+    padding: 14px;
+    gap: 12px;
+  }
+  .smart-job-filters label {
+    flex-basis: calc(50% - 12px);
+    min-width: 0;
+  }
+  .smart-job-filters .button {
+    width: 100%;
+  }
+  .resume-drawer > summary {
+    padding: 15px;
+  }
+  .smart-score-tooltip {
+    font-size: 0.7rem;
+  }
+  .smart-source-note a {
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smart-job,
+  .smart-score-ring,
+  .smart-ring-progress,
+  .smart-score-tooltip,
+  .smart-score-hint {
+    transition: none;
+    transform: none;
+  }
+}

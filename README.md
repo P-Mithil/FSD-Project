@@ -1,10 +1,12 @@
 # ResuMate
 
-The homepage reuses the original hero, Spline robot scene, black/red gradients, Outfit typography, feature cards, About content and scroll preview. Home/Analyze navigation uses browser history without reloading React, preserving shared Resume/JD text and analysis state. The mobile menu supports keyboard focus and Escape. Smooth scrolling and preview transforms respect reduced-motion preferences.
+ResuMate combines all four team features: Moiz's homepage, Sanjay's Resume/JD uploads, Nishal's Groq analysis, and Mithil's Live Jobs page.
 
-Homepage CSS is scoped to avoid changing analysis styles. The preview uses plain CSS and a small scroll handler, with no animation dependencies. The original Spline viewer loads from its CDN only on the homepage and requires network access. Its smaller-screen height matches the reference; touch input does not trigger the mouse glow. Jobs controls remain visibly disabled until Mithil's separate feature is integrated. No Jobs, backend or scoring changes are included in the homepage work.
+- `/` opens the original black/red homepage with Outfit typography, the Spline robot, About content and scroll preview.
+- `/analyze` supports PDF/DOCX uploads, pasted text and evidence-based Groq analysis.
+- `/jobs` browses Dev Global Jobs listings and compares them with the shared resume, using Mithil's deterministic job-matching engine.
 
-Resume and Job Description upload with Nishal's Groq integration milestone. Open `/analyze` (or `/`) to upload PDF/DOCX files or paste text. PDF.js and Mammoth extract text in the browser. Clicking Analyze Resume sends both texts to the Express backend, which calls Groq and validates the response before displaying it.
+The navbar and homepage buttons connect all three pages without reloading React. Resume/JD text stays in App state, and Jobs matching caches stay in memory during navigation. Refreshing clears in-memory data; Vite serves all three direct page URLs. A production static host must forward page requests to `index.html` and `/api` requests to the Express backend.
 
 ## Run locally
 
@@ -46,11 +48,11 @@ Files are limited to 5 MB, PDFs to 20 pages, resume text to 15,000 characters an
 
 ## Analysis backend
 
-`backend/server.js` exposes only `/api/analyze`, accepts JSON text with a 128 KB body limit, and returns safe errors. `api/analyze.js` reuses the original Groq request, prompt, structured-output schema, 25-second provider timeout and at most one correction attempt for invalid output. Rate-limit responses are never automatically retried. The server and frontend respect `Retry-After`, using 60 seconds if it is absent.
+`backend/server.js` serves `POST /api/analyze`, `GET /api/jobs`, and `POST /api/jobs/match`, accepts JSON text with a 128 KB body limit, and returns safe errors. `api/analyze.js` reuses the original Groq request, prompt, structured-output schema, 25-second provider timeout and at most one correction attempt for invalid output. Rate-limit responses are never automatically retried. The server and frontend respect `Retry-After`, using 60 seconds if it is absent.
 
-`src/matching.js` and `src/reviewAnalysis.js` are the unchanged reference helpers required by that response contract: evidence must come from the submitted documents, JavaScript formats the existing deterministic result, and the frontend rejects invalid results. This milestone restores their required integration; detailed scoring refinements and presentation work remain for the following milestone. The duplicate annotation locator was removed from the results component.
+`src/matching.js` and `src/reviewAnalysis.js` are the unchanged reference helpers required by that response contract: evidence must come from the submitted documents, JavaScript formats the existing deterministic result, and the frontend rejects invalid results. Analysis and Jobs keep their original scoring rules because they evaluate different inputs; there is no replacement scoring algorithm. The duplicate annotation locator was removed from the results component.
 
-Missing/invalid keys, rate limits, timeouts, network errors and malformed model output produce readable errors. Keys and complete documents are not logged. No Jobs or homepage code is included. For deployment, route `/api/analyze` to this Node backend and page requests to the frontend; the Vite proxy is for development only.
+Missing/invalid keys, rate limits, timeouts, network errors and malformed model output produce readable errors. Keys and complete documents are not logged. For deployment, route `/api/analyze` to this Node backend and page requests to the frontend; the Vite proxy is for development only.
 
 ## Scores and feedback
 
@@ -69,3 +71,11 @@ The upload and analysis features share the same App text state; extraction and v
 Automated tests cover valid and malformed API responses, missing keys, rate limits, certificate failures, weighted scoring and feedback rendering. Live Groq verification still requires a configured local backend key and a valid TLS connection; a passing mocked test is not proof of live API access.
 
 Run `npm test` for document extraction and validation tests. No test framework dependency is required.
+
+## Live Jobs
+
+Dev Global Jobs is the only job source. The server normalizes listings and retains original application links. City, work mode, employment, fresher and posting-window filters use source evidence. Future-dated or expired listings are excluded using the actual system clock; no date protection is disabled.
+
+Job matching uses Skills 40%, Role 25%, Experience 20%, Location 10%, and Education 5%, redistributing inapplicable factors. It runs locally on the Express server without sending the resume to the jobs provider or Groq. Scored jobs rank by percentage; genuinely unscorable listings have no fabricated score. Excerpt-only comparisons retain an explicit partial-estimate label. Hover, keyboard focus and mobile expansion show scores, matched/missing skills and their breakdown.
+
+The merged backend preserves both providers' timeout, validation and rate-limit handling. No database, account system or extra dependencies were added. Automated tests use controlled synthetic provider responses; those tests do not prove live provider availability. Live Groq and job-source access still require valid TLS certificates relative to the backend computer's clock. Never disable TLS validation to work around an incorrect clock.
