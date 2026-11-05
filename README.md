@@ -1,27 +1,204 @@
+<div align="center">
+
 # ResuMate
 
-ResuMate combines the team's homepage, document uploads, AI resume analysis and Live Jobs matching. It uses React, Vite and a small Express backend, with no database or login.
+### Analyze smarter. Apply better.
 
-| Page | Purpose |
+**AI Resume Analysis · Skill Insights · Live Indian Jobs**
+
+Upload your resume, understand how it fits a role, and explore jobs with the evidence behind each match.
+
+<img alt="React" src="https://img.shields.io/badge/React-19191d?style=flat&amp;logo=react&amp;logoColor=ff9aa5" />
+<img alt="Vite" src="https://img.shields.io/badge/Vite-19191d?style=flat&amp;logo=vite&amp;logoColor=ff9aa5" />
+<img alt="Express" src="https://img.shields.io/badge/Express-19191d?style=flat&amp;logo=express&amp;logoColor=ff9aa5" />
+<img alt="Node.js" src="https://img.shields.io/badge/Node.js-19191d?style=flat&amp;logo=nodedotjs&amp;logoColor=ff9aa5" />
+<img alt="OpenRouter and Groq" src="https://img.shields.io/badge/AI-OpenRouter%20%2B%20Groq-e53e50?style=flat" />
+<img alt="Vercel" src="https://img.shields.io/badge/Vercel-19191d?style=flat&amp;logo=vercel&amp;logoColor=ff9aa5" />
+
+**[Open Live Demo](https://resumate-p-mithils-projects.vercel.app/) · [Get Started](#getting-started) · [Meet the Team](#team)**
+
+</div>
+
+---
+
+## A look inside
+
+### The homepage
+
+Black/red visuals, Outfit typography and an interactive Spline robot.
+
+![ResuMate homepage with the Spline robot](docs/images/home.jpg)
+
+### Live jobs, with the evidence behind the score
+
+Ranked source listings, circular compatibility indicators and expandable skill comparisons. Incomplete descriptions are explicitly marked as estimates.
+
+![Live Jobs showing a calculated circular match score and skill comparison](docs/images/jobs.jpg)
+
+<details>
+<summary><strong>See resume upload and AI analysis</strong></summary>
+
+### Two documents. One clearer direction.
+
+![Resume and job description upload areas](docs/images/analyze.jpg)
+
+### From document evidence to feedback
+
+![A genuine AI analysis with a weighted score and skill counts](docs/images/results.jpg)
+
+</details>
+
+<sub>Actual screenshots of the deployed application. Analysis and job matching use a fictional test resume; displayed scores and listings are examples from that session, not promised outcomes.</sub>
+
+---
+
+## What you can do
+
+| Resume analysis | Live Jobs |
 | --- | --- |
-| `/` | Original black/red homepage, Outfit font, Spline robot, About section and scroll preview |
-| `/analyze` | Resume/JD upload, analysis score, annotations, strengths and improvements |
-| `/jobs` | Indian technology listings, filters, matching percentages and skill comparisons |
+| Upload a resume and JD as PDF or DOCX, or paste text | Browse Indian technology listings from Dev Global Jobs |
+| Review and edit extracted text before analysis | Filter by city, job type, remote eligibility, posting window and fresher level |
+| Compare required, preferred and partially matched qualifications | Compare resume evidence with available job requirements |
+| Inspect matched/missing skills and source evidence | View calculated scores, sorted highest first, with unscored jobs kept visible |
+| Read resume annotations, strengths and three prioritized improvements | Expand required, matched and missing skills before opening the source link |
+| Open an explainable weighted-score breakdown | Reveal scores through hover, keyboard focus or mobile interaction |
 
-## Run locally
+The interface is responsive, supports keyboard interaction and respects reduced-motion preferences. No account or database is required.
 
-Use Node.js 22.13 or later. Install dependencies with `npm ci`.
+> Match percentages are evidence-based compatibility estimates—not official ATS scores, hiring probabilities or proof of eligibility.
 
-If `backend/.env` does not exist, copy `backend/.env.example` to it and add `OPENROUTER_API_KEY`, `GROQ_API_KEY`, or both. Keep this file local; never put keys in React or `VITE_` variables. The models are configurable with `OPENROUTER_MODEL` and `GROQ_MODEL`. The defaults use a free OpenRouter model and Groq's existing model; request quotas still apply. Paid models require credits.
+## How it works
 
-Run these commands in separate terminals:
+```mermaid
+flowchart TD
+  A["Resume and JD: PDF, DOCX or pasted text"] --> B["Browser extracts and validates text"]
+  B --> C["Express: POST /api/analyze"]
+  C --> D["Configured OpenRouter and Groq requests run in parallel"]
+  D --> E["First validated response and source evidence"]
+  E --> F["Fixed weighted scoring"]
+  F --> G["Match score, annotations and feedback"]
+
+  R["Resume text and job filters"] --> J["Express: POST /api/jobs/match"]
+  S["Dev Global Jobs listings and descriptions"] --> J
+  J --> M["Rule-based matching"]
+  M --> N["Ranked jobs, skill comparisons and source links"]
+```
+
+Documents are extracted in the browser. Resume/JD text goes to the AI backend only when **Analyze Resume** is clicked. If both AI providers are configured, they run concurrently; the first validated result is used and the slower request is cancelled. Failed requests never generate a substitute score.
+
+Jobs matching runs separately in Express. Resume text is not sent to the jobs provider or an AI model; only a derived role/technology search term may be used to fetch listings. Cached profiles and matching results reduce repeated work. Hovering never makes an AI request.
+
+<details>
+<summary><strong>How the scores are calculated</strong></summary>
+
+| Factor | Resume/JD analysis | Resume-to-job matching |
+| --- | ---: | ---: |
+| Required qualifications | 45% | — |
+| Preferred qualifications | 15% | — |
+| Projects | 20% | — |
+| Experience | 15% | 20% |
+| Resume evidence | 5% | — |
+| Skills | — | 40% |
+| Role | — | 25% |
+| Location | — | 10% |
+| Education | — | 5% |
+
+AI interprets the resume/JD evidence; application rules calculate the final analysis score. Matched criteria earn full credit, partial criteria half credit and missing criteria no credit. Inapplicable factors are excluded and remaining weights are redistributed.
+
+Jobs use their own deterministic factors because a source listing differs from a submitted JD. Incomplete descriptions can receive explicitly labeled partial estimates when sufficient evidence exists. Unavailable scores remain unavailable, never an invented 0%.
+
+</details>
+
+## Tech stack
+
+| Layer | Technologies and purpose |
+| --- | --- |
+| Interface | React, JavaScript and CSS; Outfit typography |
+| Build tooling | Vite and the React plugin |
+| Backend | Node.js and Express |
+| Document reading | PDF.js (`pdfjs-dist`) for PDF; Mammoth for DOCX raw text |
+| AI analysis | OpenRouter and Groq; server-side keys and validated structured responses |
+| Job data | Dev Global Jobs API |
+| 3D visuals | Spline viewer loaded from its CDN |
+| Hosting | Vercel static frontend and an Express-backed Vercel Function |
+| Regression checks | Built-in Node.js test runner; synthetic fixtures |
+
+## Project structure
+
+```text
+FSD-Project/
+├── src/
+│   ├── pages/              # Home, Upload and Jobs
+│   ├── components/         # Navigation, document inputs and results
+│   ├── App.jsx             # Routes and shared Resume/JD state
+│   ├── readDocument.js     # Common document validation and reading
+│   ├── extractPdfText.js
+│   ├── extractDocxText.js
+│   ├── matching.js         # Resume/JD scoring rules
+│   └── *.css
+├── backend/
+│   ├── server.js           # Express setup and API routes
+│   ├── ai.js               # Parallel AI requests and cooldowns
+│   ├── analyze.js          # AI prompt and evidence validation
+│   ├── jobs.js             # Job matching orchestration and caches
+│   ├── jobSources.js       # Dev Global Jobs fetching and normalization
+│   ├── score.js            # Resume-to-job scoring
+│   └── .env.example
+├── api/index.js            # Vercel entry point for Express
+├── tests/                  # Three focused regression tests and fixtures
+├── docs/images/            # Genuine application screenshots
+├── package.json
+├── vite.config.js
+└── vercel.json
+```
+
+## Getting started
+
+Requires **Node.js 22.13 or later** and npm.
+
+**1. Clone and install**
 
 ```sh
-npm run dev
+git clone https://github.com/P-Mithil/FSD-Project.git
+cd FSD-Project
+npm ci
+```
+
+**2. Configure the backend**
+
+Copy [`backend/.env.example`](backend/.env.example) to `backend/.env`. Set at least one provider key; configure both to enable parallel requests.
+
+```dotenv
+OPENROUTER_API_KEY=your_openrouter_key
+GROQ_API_KEY=your_groq_key
+```
+
+Model names are configurable through `OPENROUTER_MODEL` and `GROQ_MODEL`; defaults are supplied in the example file. Provider quotas and credit requirements still apply. Dev Global Jobs does not require a key in this implementation.
+
+Keep keys in the backend environment. Never commit `.env` files or place secrets in `VITE_` variables.
+
+**3. Start the API**
+
+```sh
 npm run dev:api
 ```
 
-Open `http://localhost:5173`. Express listens on `127.0.0.1:3001`; Vite forwards `/api` requests to it. `npm run start:api` runs Express without file watching.
+**4. In another terminal, start React**
+
+```sh
+npm run dev
+```
+
+Open **http://localhost:5173**. Express defaults to `127.0.0.1:3001`; Vite forwards `/api` requests to it.
+
+| Route | Page |
+| --- | --- |
+| `/` | Homepage |
+| `/analyze` | Resume/JD upload and AI analysis |
+| `/jobs` | Live Jobs and resume matching |
+
+<details>
+<summary><strong>Tests, production build and deployment</strong></summary>
 
 ```sh
 npm test
@@ -29,51 +206,50 @@ npm run build
 npm run preview
 ```
 
-`preview` serves the production frontend only. A deployed site must forward page requests to `index.html` and `/api` requests to the Express server. Direct page refresh works in Vite. In-memory text and results clear on refresh.
+The three focused tests cover AI validation/parallel requests/cooldowns, jobs/scoring/ranking/cache behavior, and document extraction/validation. They use controlled responses and synthetic documents; passing them does not prove live provider availability.
 
-## How the code works
+`npm run preview` serves the built frontend only. It does not start the Express API. `npm run start:api` starts Express without file watching.
 
-- `src/App.jsx` owns the shared Resume/JD text, analysis result, navigation and Jobs session cache. Links use browser history so moving between pages preserves that state.
-- `src/pages/Home.jsx`, `Navbar.jsx` and `Preview.jsx` reproduce the reference design. Preview motion uses CSS and a simple scroll handler. The Spline robot loads from its original CDN and needs network access. Keyboard focus and reduced-motion preferences are supported.
-- `Upload.jsx` and `JobsResume.jsx` manage their own filenames, loading and field errors. Both use `readDocument.js` for common reading/validation and `DocumentInput.jsx` for accessible inputs. Upload version checks stop older results from replacing newer input.
-- `extractPdfText.js` uses PDF.js; `extractDocxText.js` uses Mammoth raw-text extraction. Files stay in browser memory. Limits are 5 MB, 20 PDF pages, 15,000 resume characters and 12,000 JD characters. PDF signatures and DOCX archive structure/expansion are validated. Scanned PDFs require pasted text; OCR is not included.
+For Vercel, import this repository with `main` as the production branch. [`vercel.json`](vercel.json) sets the Vite build, `dist` output, API routing and SPA fallback. [`api/index.js`](api/index.js) exports Express without starting a permanent server. Set provider keys securely for the required Preview/Production environments. Direct navigation and refresh use the SPA fallback for `/analyze` and `/jobs`.
 
-## Backend and scoring
+Serverless caches and cooldowns are temporary per instance, not a persistent global store. The application respects `Retry-After` without automatic retry loops. API responses use `Cache-Control: no-store`.
 
-`backend/server.js` registers all three routes with a 128 KB JSON limit and safe error handling:
+</details>
 
-| Endpoint | Workflow |
+## API endpoints
+
+| Method | Endpoint | What it does |
+| --- | --- | --- |
+| `POST` | `/api/analyze` | Accepts `{ resumeText, jobDescription }`; returns validated AI evidence, a weighted score and feedback |
+| `GET` | `/api/jobs` | Fetches and filters source listings; supports `city`, `type`, `days` and `level` |
+| `POST` | `/api/jobs/match` | Accepts `{ resumeText, filters }`; returns ranked matches, skill evidence and unscored listings |
+
+The backend validates input and limits JSON requests to 128 KB. Readable errors cover missing configuration, invalid input, provider failures, timeouts and rate limits. Previous results are preserved when an analysis request fails.
+
+## Team
+
+| Contributor | Feature responsibility |
 | --- | --- |
-| `POST /api/analyze` | Receives `{ resumeText, jobDescription }`, compares AI responses server-side and returns the first validated result |
-| `GET /api/jobs` | Fetches Dev Global Jobs listings and applies city, employment, date, remote and fresher filters |
-| `POST /api/jobs/match` | Receives `{ resumeText, filters }`, compares source requirements with the resume and returns ranked results |
+| [Mithil](https://github.com/P-Mithil) | Live Jobs and resume-to-job matching |
+| [Sanjay](https://github.com/sanjaypenta) | Resume/JD upload and document extraction |
+| [Nishal](https://github.com/SAINISHAL) | AI analysis, scoring and feedback |
+| [Moiz](https://github.com/Shaikmoiz) | Homepage, navigation and responsive UI |
 
-`backend/ai.js` runs the configured OpenRouter and Groq requests in parallel. `backend/analyze.js` uses the same prompt, evidence checks and scoring rules for either provider. Only the first fully validated response is returned; the other request is cancelled. One failed or rate-limited provider cannot hide a valid result from the other. If both fail, the form offers a manual retry and keeps the documents and previous results.
+## Limitations
 
-`src/matching.js` validates exact source evidence and applies the original fixed scoring rules. `reviewAnalysis.js` checks the response and quoted evidence before React renders it. A failed request never produces a sample result.
+- Scores reflect available evidence. Missing text, ambiguous requirements and AI interpretation can affect results; verify the source before applying.
+- Jobs come from a bounded external source pool, not every vacancy in India. Availability, freshness and complete descriptions depend on that provider.
+- Short or incomplete descriptions can produce partial estimates or unavailable scores. A partial 100% does not establish that every requirement is met.
+- AI availability depends on provider access, model support, credits and rate limits. There is no fabricated fallback analysis.
+- Uploads are limited to 5 MB; PDFs to 20 pages; extracted resume/JD text to 15,000/12,000 characters. Scanned PDFs need pasted text because OCR is not included.
+- Resume text and results are held in memory and clear on a full refresh. The Spline scene requires network access.
 
-Analysis weights are required qualifications 45%, preferred qualifications 15%, projects 20%, experience 15% and resume evidence 5%. A criterion earns 1 for matched, 0.5 for partial and 0 for missing. Unsupported categories are excluded and remaining weights are redistributed. The total is rounded once. For the fictional sample, `round(60*.45 + 25*.15 + 100*.20 + 0*.15 + 100*.05) = 56`.
+---
 
-Jobs use the separate original `backend/score.js` rules: Skills 40%, Role 25%, Experience 20%, Location 10% and Education 5%. These compare a resume with source listings rather than the full submitted JD, so they serve a different purpose. Jobs matching runs in Express without sending the resume to the jobs provider or OpenRouter.
+<div align="center">
 
-`backend/jobSources.js` normalizes Dev Global Jobs data and preserves original application URLs. `backend/jobs.js` caches profiles/results and bounds source/detail requests. Scored jobs rank highest first; unavailable scores are never zero. Partial descriptions have an explicit estimate label. Hover, keyboard focus and mobile expansion reveal scores and skill evidence. Future-dated, expired and ineligible listings are excluded using the system clock.
+**ResuMate · Analyze smarter. Apply better.**
 
-## Safety and verification
+[Try the website](https://resumate-p-mithils-projects.vercel.app/) · [Browse the source](https://github.com/P-Mithil/FSD-Project)
 
-### Vercel deployment
-
-Import `P-Mithil/FSD-Project` with `main` as the production branch. The root `vercel.json` selects Vite, `npm run build` and `dist`. API routing takes priority over static files and the SPA fallback, so `/analyze` and `/jobs` can be refreshed directly.
-
-`api/index.js` exports the existing Express app without opening a listening port. AI handling stays in the backend and cannot bypass Express validation as a separate Function. Set the provider keys as Secrets in both Preview and Production; never use a `VITE_` prefix. The Function allows 120 seconds, each analysis attempt has a total 60-second deadline, and the browser allows 75 seconds.
-
-Caches and server cooldowns are best-effort per warm instance. Cold starts or parallel instances may fetch again; no score or session requires those caches to survive. Browser session caching and cooldowns remain active, and each instance respects provider `Retry-After` responses without automatic retry loops. There is no shared global quota across instances. API responses use `Cache-Control: no-store` to keep resume results out of public CDN caches.
-
-Verify a Preview deployment before production, including synthetic analysis and live jobs. Local tests alone do not prove that cloud provider access or environment variables work.
-
-Missing keys, invalid documents, malformed AI output, timeouts and provider errors produce readable messages. Each provider's cooldown respects `Retry-After`; there is no automatic retry loop. The application allows at most one correction attempt per provider for invalid structured output. Previous results are preserved when requests fail. Keys and complete documents are not logged.
-
-Scores are evidence-based estimates, not official ATS scores, hiring probabilities or independent verification of ability. Fictional sample data is retained only for regression tests.
-
-Three focused tests cover AI response validation and parallel requests, jobs/scoring and caching, and document extraction/validation. They use synthetic fixtures in `tests/fixtures`; live providers and browser interactions still require separate checks.
-
-If Node reports `CERT_NOT_YET_VALID`, check the backend computer's clock, timezone and time synchronization. Never disable TLS verification or change Git timestamps. `.env`, `node_modules`, `dist`, logs, caches and backups are excluded from Git.
+</div>
