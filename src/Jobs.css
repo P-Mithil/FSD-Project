@@ -30,6 +30,7 @@
   color-scheme: dark;
   max-width: none;
   margin: 36px auto 0;
+  padding: 20px 0 40px;
   font-family: "Outfit", "Segoe UI", sans-serif;
   line-height: normal;
   color: var(--text);
@@ -179,11 +180,6 @@
 
 .smart-jobs .upload-label, .smart-jobs .text-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
 
-/* Black/red brand with green, amber and muted red compatibility indicators. */
-.smart-jobs {
-  width: min(1160px, calc(100% - 8vw));
-  padding: 20px 0 40px;
-}
 .smart-jobs-heading {
   display: flex;
   justify-content: space-between;

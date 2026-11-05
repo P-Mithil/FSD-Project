@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { DocumentInput } from "../components/DocumentInput.jsx";
-import { MAX_FILE_BYTES } from "../pdfValidation.js";
+import { readDocument, documentError } from "../readDocument.js";
 import "../Upload.css";
 
 export default function Upload({ text, onTextChange, onShowDemo, showSample = false, onAnalyze, loading = false, error = "" }) {
@@ -28,43 +28,16 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
     const version = ++uploads.current[kind];
     setErrors(prev => ({ ...prev, [kind]: "" }));
     setReading(prev => ({ ...prev, [kind]: false }));
-    const isDocx = file.name.toLowerCase().endsWith(".docx");
     const limit = kind === "resume" ? 15000 : 12000;
     try {
-      if (!isDocx && !file.name.toLowerCase().endsWith(".pdf")) {
-        throw new Error("INVALID_TYPE");
-      }
-      if (!file.size) throw new Error("NO_TEXT");
-      if (file.size > MAX_FILE_BYTES) throw new Error("FILE_TOO_LARGE");
       setReading(prev => ({ ...prev, [kind]: true }));
-      let value;
-      if (isDocx) {
-        const { extractDocxText } = await import("../extractDocxText.js");
-        value = await extractDocxText(file);
-      } else {
-        const { extractPdfText } = await import("../extractPdfText.js");
-        value = await extractPdfText(file);
-      }
+      const value = await readDocument(file, limit);
       if (version !== uploads.current[kind]) return;
-      if (!value.trim()) throw new Error("NO_TEXT");
-      if (value.length > limit) throw new Error("TOO_LONG");
       onTextChange(kind, value);
       setFiles(prev => ({ ...prev, [kind]: file.name }));
     } catch (err) {
       if (version !== uploads.current[kind]) return;
-      const messages = {
-        INVALID_TYPE: "Please choose a PDF or DOCX document.",
-        INVALID_PDF: "This PDF could not be read. Choose a valid text-based PDF or paste the text.",
-        PASSWORD_PDF: "This PDF is password-protected. Choose an unlocked copy or paste the text.",
-        INVALID_DOCX: "This DOCX could not be read. Choose a valid document or paste the text.",
-        DOCX_TOO_LARGE: "This DOCX expands to too much content. Choose a simpler document or paste the text.",
-        FILE_TOO_LARGE: "Please choose a document of up to 5 MB.",
-        TOO_MANY_PAGES: "Please choose a PDF of 20 pages or fewer.",
-        NO_TEXT: "No readable text was found. Choose a text-based document or paste the text.",
-        TOO_LONG: `Use up to ${limit.toLocaleString()} characters for this document.`,
-      };
-      const message = messages[err.message] || "This document could not be read. Try another file or paste the text.";
-      setErrors(prev => ({ ...prev, [kind]: message }));
+      setErrors(prev => ({ ...prev, [kind]: documentError(err, limit) }));
     } finally {
       if (version === uploads.current[kind]) {
         setReading(prev => ({ ...prev, [kind]: false }));

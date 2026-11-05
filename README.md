@@ -1,81 +1,67 @@
 # ResuMate
 
-ResuMate combines all four team features: Moiz's homepage, Sanjay's Resume/JD uploads, Nishal's Groq analysis, and Mithil's Live Jobs page.
+ResuMate combines the team's homepage, document uploads, Groq resume analysis and Live Jobs matching. It uses React, Vite and a small Express backend, with no database or login.
 
-- `/` opens the original black/red homepage with Outfit typography, the Spline robot, About content and scroll preview.
-- `/analyze` supports PDF/DOCX uploads, pasted text and evidence-based Groq analysis.
-- `/jobs` browses Dev Global Jobs listings and compares them with the shared resume, using Mithil's deterministic job-matching engine.
-
-The navbar and homepage buttons connect all three pages without reloading React. Resume/JD text stays in App state, and Jobs matching caches stay in memory during navigation. Refreshing clears in-memory data; Vite serves all three direct page URLs. A production static host must forward page requests to `index.html` and `/api` requests to the Express backend.
+| Page | Purpose |
+| --- | --- |
+| `/` | Original black/red homepage, Outfit font, Spline robot, About section and scroll preview |
+| `/analyze` | Resume/JD upload, analysis score, annotations, strengths and improvements |
+| `/jobs` | Indian technology listings, filters, matching percentages and skill comparisons |
 
 ## Run locally
 
-Use Node.js 22.13 or later. From the project root:
+Use Node.js 22.13 or later. Install dependencies with `npm ci`.
+
+If `backend/.env` does not exist, copy `backend/.env.example` to it and add your own `GROQ_API_KEY`. Keep this file local; never put keys in React or `VITE_` variables. The original default model is `openai/gpt-oss-120b`.
+
+Run these commands in separate terminals:
 
 ```sh
-npm install
 npm run dev
-```
-
-Open `http://localhost:5173`.
-
-In a second terminal, copy `backend/.env.example` to `backend/.env`, add your own `GROQ_API_KEY`, then run:
-
-```sh
 npm run dev:api
 ```
 
-The backend runs at `http://127.0.0.1:3001`; Vite forwards `/api` requests there. `npm run start:api` runs the backend without file watching. Keep the key in `backend/.env`, never in React or a `VITE_` variable. No database or Groq SDK is needed; Express is the only added dependency.
-
-## Build
+Open `http://localhost:5173`. Express listens on `127.0.0.1:3001`; Vite forwards `/api` requests to it. `npm run start:api` runs Express without file watching.
 
 ```sh
+npm test
 npm run build
 npm run preview
 ```
 
-`src/main.jsx` starts React, `src/App.jsx` contains the shared application shell, and `src/App.css` provides the base styles. A future static deployment must forward page requests to `index.html`.
+`preview` serves the production frontend only. A deployed site must forward page requests to `index.html` and `/api` requests to the Express server. Direct page refresh works in Vite. In-memory text and results clear on refresh.
 
-## Document extraction
+## How the code works
 
-`App.jsx` holds both document texts in simple React state: `text.resume` and `text.job`. `Upload` receives `text` and `onTextChange(kind, value)` as props. The Analyze button posts `{ resumeText, jobDescription }` to `/api/analyze`. `ReviewResults` receives a validated response or an empty analysis value, which shows the actual resume and an unavailable score.
+- `src/App.jsx` owns the shared Resume/JD text, analysis result, navigation and Jobs session cache. Links use browser history so moving between pages preserves that state.
+- `src/pages/Home.jsx`, `Navbar.jsx` and `Preview.jsx` reproduce the reference design. Preview motion uses CSS and a simple scroll handler. The Spline robot loads from its original CDN and needs network access. Keyboard focus and reduced-motion preferences are supported.
+- `Upload.jsx` and `JobsResume.jsx` manage their own filenames, loading and field errors. Both use `readDocument.js` for common reading/validation and `DocumentInput.jsx` for accessible inputs. Upload version checks stop older results from replacing newer input.
+- `extractPdfText.js` uses PDF.js; `extractDocxText.js` uses Mammoth raw-text extraction. Files stay in browser memory. Limits are 5 MB, 20 PDF pages, 15,000 resume characters and 12,000 JD characters. PDF signatures and DOCX archive structure/expansion are validated. Scanned PDFs require pasted text; OCR is not included.
 
-The original results component and relevant CSS are reused from the completed reference. “Show sample analysis” uses saved fictional results in `src/sampleAnalysis.json`, copied from that reference. This preview never evaluates the user's documents. A successful real response replaces the sample. Editing a document clears outdated results; request failures preserve the previous result.
+## Backend and scoring
 
-Each input has independent filename, reading and error state. Selecting a new file replaces only that document after successful extraction. Pasting or editing text cancels stale upload results. Unreadable or empty documents show an error beside that input while preserving existing text. Refreshing clears this in-memory state; documents are not saved.
+`backend/server.js` registers all three routes with a 128 KB JSON limit and safe error handling:
 
-Files are limited to 5 MB, PDFs to 20 pages, resume text to 15,000 characters and JD text to 12,000. DOCX structure and expansion limits are checked before extraction. Scanned PDFs need pasted text because OCR is not included.
+| Endpoint | Workflow |
+| --- | --- |
+| `POST /api/analyze` | Receives `{ resumeText, jobDescription }`, calls Groq server-side and validates evidence before returning results |
+| `GET /api/jobs` | Fetches Dev Global Jobs listings and applies city, employment, date, remote and fresher filters |
+| `POST /api/jobs/match` | Receives `{ resumeText, filters }`, compares source requirements with the resume and returns ranked results |
 
-## Analysis backend
+`api/analyze.js` contains the original Groq prompt, structured-output request and response handling. `src/matching.js` validates exact source evidence and applies the original fixed scoring rules. `reviewAnalysis.js` checks the response and quoted evidence before React renders it.
 
-`backend/server.js` serves `POST /api/analyze`, `GET /api/jobs`, and `POST /api/jobs/match`, accepts JSON text with a 128 KB body limit, and returns safe errors. `api/analyze.js` reuses the original Groq request, prompt, structured-output schema, 25-second provider timeout and at most one correction attempt for invalid output. Rate-limit responses are never automatically retried. The server and frontend respect `Retry-After`, using 60 seconds if it is absent.
+Analysis weights are required qualifications 45%, preferred qualifications 15%, projects 20%, experience 15% and resume evidence 5%. A criterion earns 1 for matched, 0.5 for partial and 0 for missing. Unsupported categories are excluded and remaining weights are redistributed. The total is rounded once. For the fictional sample, `round(60*.45 + 25*.15 + 100*.20 + 0*.15 + 100*.05) = 56`.
 
-`src/matching.js` and `src/reviewAnalysis.js` are the unchanged reference helpers required by that response contract: evidence must come from the submitted documents, JavaScript formats the existing deterministic result, and the frontend rejects invalid results. Analysis and Jobs keep their original scoring rules because they evaluate different inputs; there is no replacement scoring algorithm. The duplicate annotation locator was removed from the results component.
+Jobs use the separate original `backend/score.js` rules: Skills 40%, Role 25%, Experience 20%, Location 10% and Education 5%. These compare a resume with source listings rather than the full submitted JD, so they serve a different purpose. Jobs matching runs in Express without sending the resume to the jobs provider or Groq.
 
-Missing/invalid keys, rate limits, timeouts, network errors and malformed model output produce readable errors. Keys and complete documents are not logged. For deployment, route `/api/analyze` to this Node backend and page requests to the frontend; the Vite proxy is for development only.
+`backend/jobSources.js` normalizes Dev Global Jobs data and preserves original application URLs. `backend/jobs.js` caches profiles/results and bounds source/detail requests. Scored jobs rank highest first; unavailable scores are never zero. Partial descriptions have an explicit estimate label. Hover, keyboard focus and mobile expansion reveal scores and skill evidence. Future-dated, expired and ineligible listings are excluded using the system clock.
 
-## Scores and feedback
+## Safety and verification
 
-The original scoring rules are unchanged: required qualifications 45%, preferred qualifications 15%, project relevance 20%, experience relevance 15%, and resume evidence 5%. Each criterion earns 1 for matched, 0.5 for partial or 0 for missing. A category's average earns its share of the total weight. Categories the JD does not support are excluded, and their weight is redistributed among applicable categories. Rounding happens once at the end.
+Missing keys, invalid documents, malformed AI output, timeouts and provider errors produce readable messages. Rate limits respect `Retry-After`; there is no automatic retry loop. Groq allows at most one correction attempt for invalid structured output. Previous results are preserved when requests fail. Keys and complete documents are not logged.
 
-For example, the saved fictional sample has category scores of 60%, 25%, 100%, 0%, and 100%. Its result is `round(60 × .45 + 25 × .15 + 100 × .20 + 0 × .15 + 100 × .05) = 56`. This demonstrates the formula, not a score for the user's documents.
+Scores are evidence-based estimates, not official ATS scores, hiring probabilities or independent verification of ability. The sample preview is clearly labeled fictional and never substitutes automatically for failed live analysis.
 
-Results show matched, partial and missing qualifications, source-linked annotations, up to three evidence-backed resume strengths, and three prioritized improvement suggestions. No fully matched evidence produces an explicit empty strengths message. AI interprets the documents; the weighted score is an estimate, not a hiring probability or independently measured ability. The frontend checks score consistency and quoted evidence against the shared Resume/JD text before rendering a real response.
+The regression suite covers uploads, archive/signature validation, both scoring engines, evidence checks, ranking, date/location filters, cache reuse, API errors and all three routes in one Express app. Synthetic fixtures are used for deterministic tests; live providers still require separate checks.
 
-If Node reports `CERT_NOT_YET_VALID`, compare the backend computer's date, time and timezone with the certificate's validity period. Check Windows automatic time synchronization and the Windows Time service. Do not disable certificate verification or change Git timestamps. A failed secure connection shows a readable error and preserves the previous result; it never creates a replacement score.
-
-## Final integration check
-
-The upload and analysis features share the same App text state; extraction and validation stay in the existing upload components. Groq is the only AI provider. The saved, clearly labeled sample remains useful for reviewing the UI offline and never replaces a failed live request automatically. The final cleanup reuses the existing requirement lookup for score deductions and consolidates duplicate result styles without changing the design.
-
-Automated tests cover valid and malformed API responses, missing keys, rate limits, certificate failures, weighted scoring and feedback rendering. Live Groq verification still requires a configured local backend key and a valid TLS connection; a passing mocked test is not proof of live API access.
-
-Run `npm test` for document extraction and validation tests. No test framework dependency is required.
-
-## Live Jobs
-
-Dev Global Jobs is the only job source. The server normalizes listings and retains original application links. City, work mode, employment, fresher and posting-window filters use source evidence. Future-dated or expired listings are excluded using the actual system clock; no date protection is disabled.
-
-Job matching uses Skills 40%, Role 25%, Experience 20%, Location 10%, and Education 5%, redistributing inapplicable factors. It runs locally on the Express server without sending the resume to the jobs provider or Groq. Scored jobs rank by percentage; genuinely unscorable listings have no fabricated score. Excerpt-only comparisons retain an explicit partial-estimate label. Hover, keyboard focus and mobile expansion show scores, matched/missing skills and their breakdown.
-
-The merged backend preserves both providers' timeout, validation and rate-limit handling. No database, account system or extra dependencies were added. Automated tests use controlled synthetic provider responses; those tests do not prove live provider availability. Live Groq and job-source access still require valid TLS certificates relative to the backend computer's clock. Never disable TLS validation to work around an incorrect clock.
+If Node reports `CERT_NOT_YET_VALID`, check the backend computer's clock, timezone and time synchronization. Never disable TLS verification or change Git timestamps. `.env`, `node_modules`, `dist`, logs, caches and backups are excluded from Git.
