@@ -10,7 +10,6 @@ export function DocumentInput({
   onFileChange,
   onTextChange,
   prefix = "",
-  allowDocx = false,
 }) {
   const id = `${prefix}${kind}-text`;
   const errorId = `${prefix}${kind}-error`;
@@ -22,22 +21,16 @@ export function DocumentInput({
       <h3>{title}</h3>
       <div className="upload-area">
         <label className="upload-label" htmlFor={`${prefix}${kind}-file`}>
-          Upload {title.toLowerCase()} {allowDocx ? "PDF or DOCX" : "PDF"}
+          Upload {title.toLowerCase()} PDF or DOCX
         </label>
         <p className="card-help">
-          {allowDocx
-            ? "Text-based PDF or DOCX · up to 5 MB · PDFs up to 20 pages"
-            : "Text-based PDF · up to 5 MB · 20 pages"}
+          Text-based PDF or DOCX · up to 5 MB · PDFs up to 20 pages
         </p>
         <input
           id={`${prefix}${kind}-file`}
           type="file"
-          accept={
-            allowDocx
-              ? "application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
-              : "application/pdf,.pdf"
-          }
-          aria-label={`Upload ${title.toLowerCase()} ${allowDocx ? "PDF or DOCX" : "PDF"}`}
+          accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+          aria-label={`Upload ${title.toLowerCase()} PDF or DOCX`}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           disabled={disabled}

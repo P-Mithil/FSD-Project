@@ -8,8 +8,6 @@ import {
 } from "../src/matching.js";
 import { retryAfterSeconds } from "../src/retry.js";
 
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const MAX_RESUME_LENGTH = 15000;
 const MAX_JOB_DESCRIPTION_LENGTH = 12000;
 
@@ -79,7 +77,6 @@ function analysisSchema(jobDescription) {
 }
 
 function flattenCriteria(value) {
-  if (Array.isArray(value)) return value; // Existing saved fixtures remain usable.
   const categories = ["required", "preferred", "projects", "experience"];
   if (!value || categories.some((category) => !Array.isArray(value[category])))
     return null;
@@ -88,18 +85,18 @@ function flattenCriteria(value) {
   );
 }
 
-export default async function handler(req, res) {
+export default async function analyze(req, res, provider) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return sendError(res, 405, "Only POST requests are allowed.");
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = provider.key;
   if (!apiKey) {
     return sendError(
       res,
       500,
-      "The Groq API key is missing on the server. Add GROQ_API_KEY, or use Demo Mode on the website.",
+      "The AI service is not configured. Please contact the site owner.",
     );
   }
 
@@ -157,7 +154,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const signal = AbortSignal.timeout(25000);
+    const timeout = AbortSignal.timeout(60000);
+    const signal = AbortSignal.any([timeout, provider.signal]);
     const messages = [
       { role: "system", content: buildPrompt() },
       {
@@ -170,19 +168,19 @@ export default async function handler(req, res) {
     ];
     // One correction attempt for invalid AI output; never retry authentication or rate limits.
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      const response = await fetch(GROQ_URL, {
+      const response = await fetch(provider.url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: process.env.GROQ_MODEL || DEFAULT_MODEL,
+          model: provider.model,
           messages,
           temperature: 0,
-          seed: 42,
-          max_completion_tokens: 4500,
-          reasoning_effort: "low",
+          ...(provider.id === "groq"
+            ? { max_completion_tokens: 4500, reasoning_effort: "low" }
+            : { max_tokens: 4500, reasoning: { enabled: false }, provider: { require_parameters: true } }),
           response_format: {
             type: "json_schema",
             json_schema: {
@@ -200,7 +198,12 @@ export default async function handler(req, res) {
           typeof response.json === "function"
             ? await response.json().catch(() => null)
             : null;
-        const errorCode = errorData?.error?.code;
+        const errorCode = errorData?.error?.code || errorData?.error?.type;
+        console.warn("AI request rejected", {
+          provider: provider.id,
+          status: response.status,
+          code: typeof errorCode === "string" && /^[a-z_]{1,80}$/.test(errorCode) ? errorCode : "unknown",
+        });
         if (
           attempt === 0 && response.status !== 429 &&
           ["json_validate_failed", "json_generation_failed"].includes(errorCode)
@@ -212,13 +215,14 @@ export default async function handler(req, res) {
           });
           continue;
         }
-        const message = await readGroqError(response);
+        const message = getAiError(response);
         const retryAfter = retryAfterSeconds(
           response.headers?.get?.("retry-after"),
         );
         if (response.status === 429 && retryAfter !== null)
           res.setHeader("Retry-After", String(retryAfter));
-        return sendError(res, response.status === 429 ? 429 : 502, message);
+        const status = response.status === 402 ? 503 : response.status === 429 ? 429 : 502;
+        return sendError(res, status, message);
       }
 
       const payload = await response.json();
@@ -291,7 +295,7 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     if (error?.cause?.code === "CERT_NOT_YET_VALID" || error?.code === "CERT_NOT_YET_VALID") {
-      return sendError(res, 502, "A secure connection to Groq could not be established because its certificate is not valid yet. Check the backend computer's date and time.");
+      return sendError(res, 502, "A secure connection to the AI service could not be established because its certificate is not valid yet. Check the backend computer's date and time.");
     }
     if (error?.name === "TimeoutError" || error?.name === "AbortError") {
       return sendError(
@@ -354,21 +358,24 @@ Rules:
 `;
 }
 
-async function readGroqError(response) {
+function getAiError(response) {
+  if (response.status === 402) {
+    return "The AI service has no available credit or has reached its spending limit. Please contact the site owner.";
+  }
   if (response.status === 401) {
-    return "The Groq API key is invalid. Check GROQ_API_KEY in the server configuration.";
+    return "AI service authentication failed. Please contact the site owner.";
   }
   if (response.status === 429) {
     const seconds = retryAfterSeconds(response.headers?.get?.("retry-after"));
-    return `The Groq free-tier rate or token limit was reached. ${seconds > 0 && seconds <= 86400 ? `Wait ${Math.ceil(seconds)} seconds before trying again.` : "Wait before trying again, or shorten the documents."}`;
+    return `The AI service request limit was reached. ${seconds > 0 && seconds <= 86400 ? `Wait ${Math.ceil(seconds)} seconds before trying again.` : "Wait before trying again, or shorten the documents."}`;
   }
   if (response.status === 413) {
-    return "These documents exceed the Groq account token limit. Shorten the resume or job description and try again.";
+    return "These documents exceed the AI service input limit. Shorten the resume or job description and try again.";
   }
   if (response.status === 403 || response.status === 404) {
-    return "The configured Groq model is unavailable for this API project. Check GROQ_MODEL and model access.";
+    return "The AI service is unavailable. Please contact the site owner.";
   }
-  return "Groq could not complete the analysis. Please try again.";
+  return "AI could not complete the analysis. Please try again.";
 }
 
 function validateAnalysis(data, resumeText, jobDescription) {

@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { loadEnvFile } from "node:process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import analyze from "./analyze.js";
+import { createAiHandler } from "./ai.js";
 import { createJobHandlers } from "./jobs.js";
 
 export function createApp(options) {
@@ -17,7 +17,7 @@ export function createApp(options) {
   const jobs = createJobHandlers(options);
   app.get("/api/jobs", jobs.getJobs);
   app.post("/api/jobs/match", jobs.matchJobs);
-  let retryAt = 0;
+  const analyze = createAiHandler();
 
   // PDF.js already extracts PDFs in React. This endpoint receives only text.
   app.all("/api/analyze", async (req, res, next) => {
@@ -29,17 +29,8 @@ export function createApp(options) {
             "Send the resume and job description as JSON text, not file uploads.",
         });
     }
-    const wait = Math.ceil((retryAt - Date.now()) / 1000);
-    if (req.method === "POST" && wait > 0) {
-      res.setHeader("Retry-After", String(wait));
-      return res.status(429).json({ error: `Groq is rate-limited. Wait ${wait} seconds before trying again.` });
-    }
     try {
       await analyze(req, res);
-      if (res.statusCode === 429) {
-        const seconds = Number(res.getHeader("Retry-After") ?? 60);
-        retryAt = Date.now() + seconds * 1000;
-      }
     } catch (err) {
       next(err);
     }

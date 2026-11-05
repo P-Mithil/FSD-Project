@@ -201,7 +201,6 @@ export default function Jobs({
           value={resumeText}
           fileName={fileName}
           reading={reading}
-          allowDocx
           limit={15000}
           onFileChange={onFileChange}
           onTextChange={onTextChange}

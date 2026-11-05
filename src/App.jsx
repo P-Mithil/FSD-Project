@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Upload from "./pages/Upload.jsx";
 import Home from "./pages/Home.jsx";
 import { ReviewResults } from "./components/ReviewResults.jsx";
-import sample from "./sampleAnalysis.json";
 import { isAnalysisResult } from "./reviewAnalysis.js";
 import { retryAfterSeconds } from "./retry.js";
 import Navbar from "./components/Navbar.jsx";
@@ -11,7 +10,6 @@ import JobsResume from "./components/JobsResume.jsx";
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
   const [text, setText] = useState({ resume: "", job: "" });
-  const [showSample, setShowSample] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -45,7 +43,6 @@ export default function App() {
   function updateText(kind, value) {
     request.current++;
     setText(prev => ({ ...prev, [kind]: value }));
-    setShowSample(false);
     setAnalysis(null);
     setError("");
     setLoading(false);
@@ -55,7 +52,7 @@ export default function App() {
     if (loading) return;
     const wait = Math.ceil((retryAt.current - Date.now()) / 1000);
     if (wait > 0) {
-      setError(`Groq is rate-limited. Wait ${wait} seconds, then click Analyze Resume again.`);
+      setError(`AI is rate-limited. Wait ${wait} seconds, then click Analyze Resume again.`);
       return;
     }
     const resumeText = text.resume.trim();
@@ -79,14 +76,14 @@ export default function App() {
       const res = await fetch("/api/analyze", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resumeText, jobDescription }),
-        signal: AbortSignal.timeout(35000),
+        signal: AbortSignal.timeout(75000),
       });
       const data = await res.json().catch(() => null);
       if (version !== request.current) return;
       if (res.status === 429) {
         const seconds = retryAfterSeconds(res.headers.get("retry-after")) ?? 60;
         retryAt.current = Date.now() + seconds * 1000;
-        setError(`Groq is rate-limited. Wait ${seconds} seconds, then click Analyze Resume again.`);
+        setError(data?.error || `AI is rate-limited. Wait ${seconds} seconds, then click Analyze Resume again.`);
         return;
       }
       if (!res.ok) {
@@ -98,7 +95,6 @@ export default function App() {
         return;
       }
       setAnalysis(data);
-      setShowSample(false);
     } catch (err) {
       if (version !== request.current) return;
       setError(err.name === "TimeoutError"
@@ -118,17 +114,14 @@ export default function App() {
         <Upload
           text={text}
           onTextChange={updateText}
-          onShowDemo={() => setShowSample(value => !value)}
-          showSample={showSample}
           onAnalyze={analyze}
           loading={loading}
           error={error}
         />
         <ReviewResults
-          analysis={showSample ? sample.analysis : analysis}
-          isDemo={showSample}
-          resumeText={showSample ? sample.resumeText : text.resume}
-          jobDescription={showSample ? sample.jobDescription : text.job}
+          analysis={analysis}
+          resumeText={text.resume}
+          jobDescription={text.job}
         />
       </> : null}
       {!["/", "/analyze", "/jobs"].includes(path) ? <main>

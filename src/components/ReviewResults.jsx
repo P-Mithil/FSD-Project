@@ -13,7 +13,7 @@ const STATUS_LABELS = {
   missing: "Missing",
 };
 
-export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) {
+export function ReviewResults({ analysis, resumeText, jobDescription }) {
   const ready = Boolean(analysis);
   const data = analysis || {
     matchScore: null, scoreExplanation: "Analyze your resume and job description above to see their evidence-based comparison.",
@@ -40,12 +40,6 @@ export function ReviewResults({ analysis, isDemo, resumeText, jobDescription }) 
       {!ready ? <p className="demo-banner" role="status">
         {resumeText.trim() ? "Resume ready" : "Add your resume"} · {jobDescription?.trim() ? "Job description ready" : "Add a job description"}. No score has been calculated.
       </p> : null}
-      {isDemo ? (
-        <p className="demo-banner" role="status">
-          Sample analysis · Fictional resume and saved results. Your documents
-          were not sent to AI.
-        </p>
-      ) : null}
       <section className="card match-overview" aria-labelledby="overview-title">
         <div className="overview-heading">
           <p className="eyebrow">Your analysis</p>

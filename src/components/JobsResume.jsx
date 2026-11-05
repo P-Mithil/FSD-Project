@@ -24,7 +24,6 @@ export default function JobsResume({ resumeText, onTextChange, session }) {
     if (!file) return;
     const version = ++uploads.current;
     setError("");
-    setReading(false);
     setReading(true);
     try {
       const text = await readDocument(file, 15000);

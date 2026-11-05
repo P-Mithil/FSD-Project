@@ -3,7 +3,7 @@ import { DocumentInput } from "../components/DocumentInput.jsx";
 import { readDocument, documentError } from "../readDocument.js";
 import "../Upload.css";
 
-export default function Upload({ text, onTextChange, onShowDemo, showSample = false, onAnalyze, loading = false, error = "" }) {
+export default function Upload({ text, onTextChange, onAnalyze, loading = false, error = "" }) {
   const [files, setFiles] = useState({ resume: "", job: "" });
   const [errors, setErrors] = useState({ resume: "", job: "" });
   const [reading, setReading] = useState({ resume: false, job: false });
@@ -27,7 +27,6 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
     if (!file) return;
     const version = ++uploads.current[kind];
     setErrors(prev => ({ ...prev, [kind]: "" }));
-    setReading(prev => ({ ...prev, [kind]: false }));
     const limit = kind === "resume" ? 15000 : 12000;
     try {
       setReading(prev => ({ ...prev, [kind]: true }));
@@ -61,7 +60,6 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
             fileName={files.resume}
             reading={reading.resume}
             error={errors.resume}
-            allowDocx
             disabled={loading}
             limit={15000}
             onFileChange={selectFile}
@@ -74,7 +72,6 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
             fileName={files.job}
             reading={reading.job}
             error={errors.job}
-            allowDocx
             disabled={loading}
             limit={12000}
             onFileChange={selectFile}
@@ -82,12 +79,11 @@ export default function Upload({ text, onTextChange, onShowDemo, showSample = fa
           />
         </div>
         {error ? <p className="error-box" role="alert">{error}</p> : null}
-        {loading ? <p className="fine-print" role="status">Analyzing your documents with Groq...</p> : null}
+        {loading ? <p className="fine-print" role="status">AI is analyzing your documents...</p> : null}
         <div className="action-row">
-          <button className="button" type="button" onClick={onAnalyze} disabled={!onAnalyze || loading || reading.resume || reading.job} aria-busy={loading}>{loading ? "Analyzing..." : "Analyze Resume"}</button>
-          <button className="button button-secondary" type="button" disabled={!onShowDemo || loading} onClick={onShowDemo} aria-pressed={showSample}>{showSample ? "Back to your documents" : "Show sample analysis"}</button>
+          <button className="button" type="button" onClick={onAnalyze} disabled={!onAnalyze || loading || reading.resume || reading.job} aria-busy={loading}>{loading ? "Analyzing..." : error ? "Try again" : "Analyze Resume"}</button>
         </div>
-        <p className="fine-print">Documents are read in your browser. Both texts are sent to Groq through our server only when you click Analyze Resume. Sample analysis uses fictional data.</p>
+        <p className="fine-print">Documents are read in your browser. Both texts are sent for AI analysis only when you click Analyze Resume.</p>
       </section>
     </main>
   );
