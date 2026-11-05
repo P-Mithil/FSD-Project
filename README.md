@@ -235,16 +235,7 @@ The backend validates input and limits JSON requests to 128 KB. Readable errors 
 | [Nishal](https://github.com/SAINISHAL) | AI analysis, scoring and feedback |
 | [Moiz](https://github.com/Shaikmoiz) | Homepage, navigation and responsive UI |
 
-## Limitations
 
-- Scores reflect available evidence. Missing text, ambiguous requirements and AI interpretation can affect results; verify the source before applying.
-- Jobs come from a bounded external source pool, not every vacancy in India. Availability, freshness and complete descriptions depend on that provider.
-- Short or incomplete descriptions can produce partial estimates or unavailable scores. A partial 100% does not establish that every requirement is met.
-- AI availability depends on provider access, model support, credits and rate limits. There is no fabricated fallback analysis.
-- Uploads are limited to 5 MB; PDFs to 20 pages; extracted resume/JD text to 15,000/12,000 characters. Scanned PDFs need pasted text because OCR is not included.
-- Resume text and results are held in memory and clear on a full refresh. The Spline scene requires network access.
-
----
 
 <div align="center">
 
